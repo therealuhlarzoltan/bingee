@@ -9,4 +9,4 @@ class CustomUser(AbstractUser):
     country = models.CharField(max_length=2, choices=settings.COUNTRY_CHOICES, default="US"),
     gender = models.CharField(max_length=6, choices=settings.GENDER_CHOICES, default="M")
 
-    REQUIRED_FIELDS = ['birth_date', 'country', 'gender']
+    REQUIRED_FIELDS = ['birth_date', 'country', 'gender', 'first_name', 'last_name', 'email']
