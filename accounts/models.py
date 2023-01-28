@@ -5,8 +5,8 @@ from django.conf import settings
 
 # Create your models here.
 class CustomUser(AbstractUser):
-    birth_date = models.DateField(),
-    country = models.CharField(max_length=2, choices=settings.COUNTRY_CHOICES, default="US"),
-    gender = models.CharField(max_length=6, choices=settings.GENDER_CHOICES, default="M")
+    birth_date = models.DateField(null=True)
+    gender = models.CharField(max_length=2, choices=settings.GENDER_CHOICES, default="M")
+    country = models.CharField(max_length=2, choices=settings.COUNTRY_CHOICES, default="US")
 
-    REQUIRED_FIELDS = ['birth_date', 'country', 'gender', 'first_name', 'last_name', 'email']
+    REQUIRED_FIELDS =['email', 'password', 'birth_date', 'gender', 'country', 'first_name', 'last_name']
