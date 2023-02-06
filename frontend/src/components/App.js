@@ -3,15 +3,21 @@ import { render } from "react-dom";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider, } from "react-router-dom";
 
-import Login from "./Login";
-import Home from "./Home";
-import Logout from "./Logout";
-import Register from "./Register";
+import { AuthProvider } from "../context/AuthContext";
+
+import Login from "../pages//Login";
+import Home from "../pages/Home";
+import Logout from "../pages/Logout";
+import Register from "../pages/Register";
+import Landing from "../pages/Landing";
+
+import PrivateRoute from "../pages/PrivateRoute";
+
 
  const router = createBrowserRouter([
    {
      path: "/",
-     element: <Home/>,
+     element: <Home />
   },
   {
     path: "login/",
@@ -19,12 +25,12 @@ import Register from "./Register";
    },
    {
     path: "logout/",
-    element: <Logout />
+     element: <PrivateRoute route={<Logout />} />
    },
    {
     path: "register/",
     element: <Register />
-  },
+   },
 
 ]);
 
@@ -43,7 +49,9 @@ export default class App extends Component {
 }
 ReactDOM.createRoot(document.getElementById("app")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
 );
 
