@@ -72,8 +72,15 @@ function Register() {
             setStatus(201);
         }
         else if (status === 400) {
-            const keys = Object.keys(response.message);
-            const key = keys[0];
+            let key;
+            if (response.hasOwnProperty("message")) {
+                const keys = Object.keys(response.message);
+                key = keys[0];
+            }
+            else {
+                key = Object.keys(response)[0];
+            }
+            
             let field;
             if (faulty_words.includes(key)) {
                 if (key === "password2") {
@@ -97,7 +104,13 @@ function Register() {
             let firstLetter = field.charAt(0).toUpperCase();
             field = field.slice(1);
             const str = firstLetter + field 
-            setAlert(`${str}:  ${response.message[key]}`);
+            if (response.hasOwnProperty("message")) {
+                setAlert(`${str}:  ${response.message[key]}`);
+            }
+            else {
+                setAlert(`${str}:  ${response[key]}`);
+            }
+            
             setStatus(400);
         }
         else {

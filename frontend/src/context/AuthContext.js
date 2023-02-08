@@ -21,6 +21,10 @@ export const AuthProvider = ({ children }) => {
         }
         let response = await fetch('http://127.0.0.1:8000/accounts/token/obtain/', requestOptions)
         let data = await response.json()
+        return {
+            "data": data,
+            "response": response
+        }
         
     }
 

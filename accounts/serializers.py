@@ -21,6 +21,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
     gender = serializers.CharField(write_only=True)
     birth_date = serializers.DateField(write_only=True)
     email = serializers.EmailField(write_only=True)
+    first_name = serializers.CharField(write_only=True)
+    last_name = serializers.CharField(write_only=True)
 
     class Meta:
         model = CustomUser
