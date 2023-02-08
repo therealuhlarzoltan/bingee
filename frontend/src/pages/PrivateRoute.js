@@ -2,12 +2,13 @@ import { Navigate } from "react-router-dom";
 import { render } from "react-dom";
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
 
 function PrivateRoute(props) {
-    console.log("Hello from private route")
-    const authenticated = false
+    let {user} = useContext(AuthContext);
     return (
-        authenticated ?
+        user ?
             props.route :
             <Navigate to={"/"} replace={true}/>
     );

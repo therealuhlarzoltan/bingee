@@ -15,6 +15,8 @@ import IconButton from '@mui/material/IconButton';
 import { useContext } from 'react';
 import AuthContext from '../context/AuthContext';
 
+import { Navigate } from 'react-router-dom';
+
 
 
 function Login() {
@@ -65,6 +67,7 @@ function Login() {
         <Box sx={{ width: '100%' }}>
         <Grid container rowSpacing={1.5} alignItems="center" justify="center" direction="column">
             <Grid item xs={12} id="alert-grid">
+                    {status === 200 ? <Navigate to={"/"} replace={true} /> : null}
                     {status && status != 200 ?
                         <Alert severity="error" sx={{margin: "auto", mb: 2 }}
                         action={

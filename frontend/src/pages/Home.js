@@ -8,10 +8,12 @@ import HomePageContent from "../components/HomePageContent";
 
 function Home() {
     const authenticated = true
+    let {user} = useContext(AuthContext);
+    console.log(user)
 
     return (
-        authenticated ?
-            <HomePageContent />: <Landing />
+        user ?
+            <HomePageContent username={user.username} />: <Landing />
             
     );
 }

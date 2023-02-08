@@ -4,13 +4,12 @@ import ReactDOM from 'react-dom';
 import { useState, useEffect, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 
-function HomePageContent() {
+function HomePageContent(props) {
 
-    let { name } = useContext(AuthContext);
-
+    let { user } = useContext(AuthContext);
     return (
-
-        <div>Welcome {name}</div>
+        
+        <div>Welcome {props.username}</div>
     );
 }
 
