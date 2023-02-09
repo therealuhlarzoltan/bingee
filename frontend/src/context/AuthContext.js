@@ -4,14 +4,13 @@ import { render } from "react-dom";
 import React from 'react';
 import ReactDOM from 'react-dom';
 import jwt_decode from "jwt-decode"
-import { useNavigate } from "react-router-dom";
+import { redirect } from "react-router-dom";
 
 const AuthContext = createContext()
 
 export default AuthContext
 
 export const AuthProvider = ({ children }) => {
-
     
     let [authTokens, setAuthTokens] = useState(() => localStorage.getItem("authTokens") ? JSON.parse(localStorage.getItem("authTokens")) : null)
     let [user, setUser] = useState(() => localStorage.getItem("authTokens") ? jwt_decode(localStorage.getItem("authTokens")) : null)
@@ -38,9 +37,17 @@ export const AuthProvider = ({ children }) => {
         
     }
 
+    let logout = () => {
+        setUser(null);
+        setAuthTokens(null);
+        localStorage.removeItem("authTokens");
+        window.location.href = "/";
+    }
+
     let contextData = {
         "login": login,
         "user": user,
+        "logout": logout,
     }
 
     return (

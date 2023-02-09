@@ -24,9 +24,8 @@ import IconButton from '@mui/material/IconButton';
 import { Link } from "react-router-dom";
 
 
-
 function Register() {
-
+ 
     const [status, setStatus] = useState("");
     const [alert, setAlert] = useState("");
 
@@ -143,7 +142,7 @@ function Register() {
         .then(obj => handleRegistrationResponse(obj.data, obj.status))
         .catch((error) => setStatus(500));
     }
-
+   
     return (
         <Box sx={{ width: '100%' }}>
         <Grid container rowSpacing={2} columnSpacing={4}>

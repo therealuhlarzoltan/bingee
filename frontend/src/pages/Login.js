@@ -24,7 +24,8 @@ function Login() {
     const [status, setStatus] = useState(null)
     const [alert, setAlert] = useState(null)
 
-    let {login} = useContext(AuthContext)
+    let { login } = useContext(AuthContext);
+    let { user } = useContext(AuthContext);
 
     const [username, setUsername] = useState("");
     const handleUsernameChange = (event) => {
@@ -36,7 +37,7 @@ function Login() {
         setPassword(event.target.value);
     };
 
-    async function  handleLoginButtonClicked() {
+    async function handleLoginButtonClicked() {
         try {
             let result = await login(username, password)
             if (result.response.ok) {
@@ -65,6 +66,7 @@ function Login() {
 
     return (
         <Box sx={{ width: '100%' }}>
+        {user ? <Navigate to={"/"} replace={true} /> : null}
         <Grid container rowSpacing={1.5} alignItems="center" justify="center" direction="column">
             <Grid item xs={12} id="alert-grid">
                     {status === 200 ? <Navigate to={"/"} replace={true} /> : null}
