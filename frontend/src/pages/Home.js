@@ -7,9 +7,7 @@ import { useContext } from "react";
 import HomePageContent from "../components/HomePageContent";
 
 function Home() {
-    const authenticated = true
     let {user} = useContext(AuthContext);
-    console.log(user)
 
     return (
         user ?
