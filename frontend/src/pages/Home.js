@@ -9,11 +9,10 @@ import HomePageContent from "../components/HomePageContent";
 function Home() {
     let {user} = useContext(AuthContext);
 
-    return (
-        user ?
-            <HomePageContent username={user.username} />: <Landing />
-            
-    );
+        return (
+            user ?
+                <HomePageContent username={user.username} /> : <Landing />
+        );
 }
 
 export default Home

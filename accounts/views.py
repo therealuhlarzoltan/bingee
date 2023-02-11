@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from .serializers import CustomTokenObtainPairSerializer
 
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 from .serializers import UserCreateSerializer
