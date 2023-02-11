@@ -22,6 +22,9 @@ import { margin } from "@mui/system";
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
+import { Navigate } from "react-router-dom";
 
 
 function Register() {
@@ -61,6 +64,8 @@ function Register() {
     const handleGenderChange = (event) => {
         setGender(event.target.value);
     };
+
+    const { user } = useContext(AuthContext);
 
 
     function handleRegistrationResponse(response, status) {
@@ -145,6 +150,7 @@ function Register() {
    
     return (
         <Box sx={{ width: '100%' }}>
+        {user ? <Navigate to={"/"} replace={true} /> : null}
         <Grid container rowSpacing={2} columnSpacing={4}>
             <Grid item xs={12} id="alert-grid">
                     {status === 201 ?
