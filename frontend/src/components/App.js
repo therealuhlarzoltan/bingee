@@ -9,7 +9,7 @@ import Login from "../pages//Login";
 import Home from "../pages/Home";
 import Logout from "../pages/Logout";
 import Register from "../pages/Register";
-import Landing from "../pages/Landing";
+import SearchResults from "../pages/SearchResults";
 
 import PrivateRoute from "../pages/PrivateRoute";
 
@@ -31,6 +31,10 @@ import PrivateRoute from "../pages/PrivateRoute";
     path: "register/",
     element: <Register />
    },
+   {
+     path: "search/:q",
+     element: <SearchResults />
+   }
 
 ]);
 

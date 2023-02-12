@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     #Local
     "frontend",
     "accounts",
+    "shows",
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
