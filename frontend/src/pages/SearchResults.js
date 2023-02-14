@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { useParams } from "react-router-dom";
 import { Grid } from "@mui/material";
-import { Box } from "@mui/system";
+import { Box, height } from "@mui/system";
 import SideDrawer from "../components/SideDrawer";
 import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
@@ -11,6 +11,29 @@ import Typography from "@mui/material/Typography";
 
 import { useEffect, useState } from "react";
 
+import Stack from '@mui/material/Stack';
+import CircularProgress from '@mui/material/CircularProgress';
+
+import { styled } from '@mui/material/styles';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardMedia from '@mui/material/CardMedia';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Collapse from '@mui/material/Collapse';
+import Avatar from '@mui/material/Avatar';
+import IconButton from '@mui/material/IconButton';
+import { red } from '@mui/material/colors';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ShareIcon from '@mui/icons-material/Share';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Button from "@mui/material/Button";
+
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+
+import grey from "@mui/material/colors";
+
+import SeriesCard from "../components/SeriesCard";
 
 
 
@@ -19,46 +42,85 @@ import { useEffect, useState } from "react";
 
 function SearchResults(props) {
 
+    const [seriesIndex, setSeriesIndex] = useState(null);
+    const [seriesData, setSeriesData] = useState(null)
+
     let { user, authTokens } = useContext(AuthContext);
 
     let { q } = useParams();
 
+
+    function DisplaySearchResults(status, data) {
+        setSeriesData(data.data)
+        const indexes = Object.keys(data.data).filter(index => data.data[index].titleType === "tvSeries")
+        setSeriesIndex(indexes)
+        
+
+    }
+
+
     async function PerformSearch() {
-        console.log("Should be searching")
-        const requestOptions = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": 'Bearer ' + String(authTokens?.access)
-            },
-            body: JSON.stringify({ "q": q})
+        setSeriesData(null);
+        setSeriesIndex(null);
+        try {
+            const requestOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                },
+                body: JSON.stringify({ "q": q })
+            }
+            let response = await fetch('http://127.0.0.1:8000/shows/api/search/title/', requestOptions)
+            if (response.ok) {
+                if (response.status === 204) {
+                    console.log("Not found")
+                }
+                else {
+                    let data = await response.json()
+                    DisplaySearchResults(response.status, data)
+                }
+            }
+            else {
+
+            }
+            
+        } catch (error) {
+            console.error(error)
         }
-        let response = await fetch('http://127.0.0.1:8000/shows/api/search/title/', requestOptions)
-        let data = await response.json()
-        console.log(data)
     }
 
     useEffect(() => {
         PerformSearch();
-    }, [])
+    }, [q])
 
 
     return (
-        <Box sx={{width: "100%"}}>
-            <Grid container columnSpacing={3}>
-                <Grid item xs={3}>
+            <Grid container columnSpacing={0} rowSpacing={3}>
+                <Grid item xs={3} flexDirection="column">
                     <SideDrawer firstName={user.firstName} lastName={user.lastName} />
                 </Grid>
-                <Grid item xs={9}>
-                    <Grid item xs={9}>
-                        <Typography variant="h4">TV shows matching "{q}"</Typography>
+                <Grid item xs={9} flexDirection="column">
+                    <Grid item xs={9} flexDirection="row" style={{"max-width": "100%"}} justify="center">
+                        <Typography variant="h4" sx={{ml: 2, mb: 2}}>TV shows matching "{q}"</Typography>
                     </Grid>
-                    <Grid item xs={9}>
-                        Loading...
+                    <Grid item xs={9} flexDirection="row" style={{ "max-width": "100%" }}>
+                        {!seriesIndex &&
+                        <Stack sx={{ color: 'grey.500' }} spacing={2} direction="row" justifyItems="center" justifyContent="center">
+                            <CircularProgress color="inherit" style={{ "position": "absolute", "top": "45%" }} />
+                        </Stack>}
+                        <Stack spacing={4} direction="row" flexWrap={"wrap"} sx={{paddingLeft: 2}}>
+                            {seriesIndex ? 
+                                seriesIndex.map(index => {
+                                    return (
+                                        <SeriesCard title={seriesData[index]?.title} image={seriesData[index].image?.url} />
+                                    );
+                                })
+                            : null}
+                        </Stack>
                     </Grid>
                 </Grid>
             </Grid>
-        </Box>
     );
 }
 

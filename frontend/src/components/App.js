@@ -33,7 +33,7 @@ import PrivateRoute from "../pages/PrivateRoute";
    },
    {
      path: "search/:q",
-     element: <SearchResults />
+     element: <PrivateRoute route={<SearchResults />} />
    }
 
 ]);

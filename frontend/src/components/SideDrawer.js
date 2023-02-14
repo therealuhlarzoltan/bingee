@@ -54,17 +54,17 @@ function SideDrawer(props) {
   }
 
 
-  const drawerWidth = 320;
+  // const drawerWidth = 320;
 
     return (
         <Drawer
         sx={{
           backgroundColor: grey[800],
           color: purple[800],
-          width: drawerWidth,
+          width: "25%",
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: drawerWidth,
+            width: "25%",
             boxSizing: 'border-box',
           },
         }}
@@ -138,7 +138,7 @@ function SideDrawer(props) {
         </List>
         
         <Divider />
-        <Typography variant="subtitle2" sx={{ mt: 2, ml: 2 }}>{props.firstName.toUpperCase()} {props.lastName.toUpperCase()}</Typography>
+        <Typography variant="subtitle2" sx={{ mt: 2, ml: 2 }}>{props?.firstName?.toUpperCase()} {props?.lastName?.toUpperCase()}</Typography>
         <List>
             <ListItem key={"Settings"} disablePadding>
               <ListItemButton>
