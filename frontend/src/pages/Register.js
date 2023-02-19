@@ -25,6 +25,7 @@ import { Link } from "react-router-dom";
 import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
+import Paper from "@mui/material/Paper";
 
 
 function Register() {
@@ -152,6 +153,7 @@ function Register() {
         <Box sx={{ width: '100%' }}>
         {user ? <Navigate to={"/"} replace={true} /> : null}
         <Grid container rowSpacing={2} columnSpacing={4}>
+            
             <Grid item xs={12} id="alert-grid">
                     {status === 201 ?
                          <Alert severity="success" sx={{ width: "36%", margin: "auto", mb: 2 }}
@@ -188,6 +190,7 @@ function Register() {
                             {alert}
                     </Alert> : null}
             </Grid>
+            {/* <Paper elevation={3} sx={{width: "40%"}}> */}
             <Grid item xs={12} align="center">
                 <Typography variant="h2" gutterBottom>
                     Register
@@ -277,8 +280,7 @@ function Register() {
             </Grid>
             <Grid item xs={12} align="center">
                 <Button
-    
-                    color="primary"
+                    sx={{color: blue["700"], borderColor: blue["700"], backgroundColor: "white", ":hover": { backgroundColor: blue["700"], color: "white", borderColor: blue["700"] }}}
                     size="large"
                     variant="outlined"
                     onClick={handleRegisterButtonClicked}
@@ -286,6 +288,7 @@ function Register() {
                 Register
                 </Button>    
             </Grid>
+            {/* </Paper> */}
         </Grid>
       </Box>
     );

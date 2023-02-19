@@ -3,7 +3,6 @@ import { render } from "react-dom";;
 import ReactDOM from 'react-dom';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import { pink, blue } from '@mui/material/colors';
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import { useState } from "react";
@@ -16,6 +15,9 @@ import { useContext } from 'react';
 import AuthContext from '../context/AuthContext';
 
 import { Navigate } from 'react-router-dom';
+
+import { blue, white, purple } from '@mui/material/colors';
+import { Paper } from '@mui/material';
 
 
 
@@ -90,8 +92,10 @@ function Login() {
                         </Alert> : null
                     }
             </Grid>
+            <Paper elevation={3} sx={{width: "30%"}}>
+            <Grid container rowSpacing={1.5} alignItems="center" justify="center" direction="column" >
             <Grid item xs={12}>
-                <Typography variant="h2" gutterBottom>
+                <Typography variant="h2" gutterBottom sx={{mt: 4}}>
                     Login
                 </Typography>
             </Grid>
@@ -113,8 +117,7 @@ function Login() {
                     /> 
             </Grid>
             <Grid xs={8}>
-                <Button sx={{"marginTop": "10px"}}
-                    color="primary"
+                <Button sx={{"marginTop": "10px", color: purple['500'], borderColor: purple["700"], ":hover": { backgroundColor: purple["700"], color: "white", borderColor: purple["700"] }, mb: 4 }}
                     size="large"
                     variant="outlined"
                     onClick={handleLoginButtonClicked}
@@ -128,6 +131,8 @@ function Login() {
             <Grid xs={8}>
                     
             </Grid>
+            </Grid>
+            </Paper>
             </Grid>
             </Box>
     );

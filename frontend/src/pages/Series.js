@@ -17,11 +17,52 @@ import AddedSeries from "../components/AddedSeries";
 import NewSeries from "../components/NewSeries";
 
 
-function Series(props) {
+function Series() {
+
+    const { id } = useParams();
+    const [seriesData, setSeriesData] = useState(null);
+    const [firstLoad, setFirstLoad] = useState(true)
+
+    let { authTokens } = useContext(AuthContext)
+
+    async function lookUpShow(id) {
+        setFirstLoad(false)
+        try {
+            const requestOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                },
+                body: JSON.stringify({ "title_id": id })
+            }
+            let response = await fetch('/shows/api/details/title/', requestOptions)
+            console.log("response: ", response)
+            if (response.ok) {
+                let data = await response.json()
+                console.log("data: ", data)
+                setSeriesData(data)
+            
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    if (firstLoad) {
+        lookUpShow(id)
+    }
+    
 
     return (
-        props?.added ? <AddedSeries /> : <NewSeries />
+        !seriesData ? <Stack sx={{ color: 'grey.500' }} spacing={2} direction="row" justifyItems="center" justifyContent="center">
+        <CircularProgress color="inherit" style={{ "position": "absolute", "top": "45%" }} />
+        </Stack> :
+        (seriesData && seriesData.internalData?.added ? (<AddedSeries seriesData={seriesData} />) : (seriesData && <NewSeries seriesData={seriesData} />))
+        
+        
     );
+    
 }
 
 export default Series

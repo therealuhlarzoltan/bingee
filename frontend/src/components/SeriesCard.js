@@ -17,6 +17,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { Link } from "react-router-dom";
 
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
@@ -36,10 +37,12 @@ function SeriesCard(props) {
                 height="280"
                 image={props?.image}
             />
-            <CardContent sx={{display: "flex", alignContent: "center", alignItems: "center", justifyContent: "flex-start", justifyItems: "flex-start"}}>
-                <Typography gutterBottom variant="subtitle2" fontSize={19}>
-                    {props?.title}
-                </Typography>
+            <CardContent sx={{ display: "flex", alignContent: "center", alignItems: "center", justifyContent: "flex-start", justifyItems: "flex-start" }}>
+                <Link to={`/show/${props?.titleId}`} style={{"text-decoration": "none", "color":"black"}}>
+                    <Typography gutterBottom variant="subtitle2" fontSize={19}>
+                        {props?.title}
+                    </Typography>
+                </Link>
             </CardContent>
         </Card> 
     );    

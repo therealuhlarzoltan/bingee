@@ -8,6 +8,7 @@ import SideDrawer from "../components/SideDrawer";
 import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import Typography from "@mui/material/Typography";
+import { Link } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 
@@ -71,7 +72,7 @@ function SearchResults(props) {
                 },
                 body: JSON.stringify({ "q": q })
             }
-            let response = await fetch('http://127.0.0.1:8000/shows/api/search/title/', requestOptions)
+            let response = await fetch('/shows/api/search/title/', requestOptions)
             if (response.ok) {
                 if (response.status === 204) {
                     console.log("Not found")
@@ -113,7 +114,7 @@ function SearchResults(props) {
                             {seriesIndex ? 
                                 seriesIndex.map(index => {
                                     return (
-                                        <SeriesCard title={seriesData[index]?.title} image={seriesData[index].image?.url} />
+                                        <SeriesCard title={seriesData[index]?.title} image={seriesData[index].image?.url} titleId={seriesData[index]?.id.substring(7)} />
                                     );
                                 })
                             : null}

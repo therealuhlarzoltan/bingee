@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ "username": username, "password": password })
         }
-        let response = await fetch('http://127.0.0.1:8000/accounts/token/obtain/', requestOptions)
+        let response = await fetch('/accounts/token/obtain/', requestOptions)
         let data = await response.json()
 
         if (response.status === 200) {
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
                     "refresh_token": authTokens?.refresh
                 })
             }
-            let response = await fetch('http://127.0.0.1:8000/accounts/token/logout/', requestOptions)
+            let response = await fetch('/accounts/token/logout/', requestOptions)
             }  catch (error) {
                 return {"error": true}
             }
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ "refresh": authTokens?.refresh })
             }
-            let response = await fetch('http://127.0.0.1:8000/accounts/token/refresh/', requestOptions)
+            let response = await fetch('/accounts/token/refresh/', requestOptions)
             let data = await response.json()
 
             if (response.ok) {

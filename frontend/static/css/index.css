@@ -4,4 +4,31 @@
 
 body > #main > div {
     height: 100vh;
-  }
+}
+
+#seriesOverviewInfo {
+    margin-left: 0;
+    display: inline-block;
+    padding-left: 4px;
+}
+
+#seriesOverviewInfo li {
+    display: inline-block;
+    color: gray;
+    margin-right: 10px;
+}
+
+#seriesOverviewInfo li:first-child {
+    display: inline-block;
+    color: gray;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+
+#seriesOverviewInfo  li::before {
+    content: "\2022";
+    color: gray;
+    margin-right: 3px;
+}
+

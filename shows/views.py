@@ -56,7 +56,7 @@ class GetSeriesDetails(APIView):
                 "seriesEndYear": response_json.get("seriesEndYear"),
                 "imdbRatings": response_json.get("ratings").get("ratings"),
                 "genres": response_json.get("genres"),
-                "plotOutline": response_json.get("plotOutline").get("text")
+                "plotOutline": response_json.get("plotSummary").get("text")
 
             }
 
@@ -67,18 +67,25 @@ class GetSeriesDetails(APIView):
             response = make_request("GET", "https://imdb8.p.rapidapi.com/title/get-overview-details", {"tconst": title_id})
             response_json = response.json()
 
+            img_dict = response_json.get("title").get("image")
+            img = ""
+            if img_dict:
+                img = img_dict.get("url")
+
             api_data = {
-                "img": response_json.get("image").get("url"),
-                "runningTimeInMinutes": response_json.get("runningTimeInMinutes"),
-                "numberOfEpisodes": response_json.get("numberOfEpisodes"),
-                "seriesStartYear": response_json.get("seriesStartYear"),
-                "seriesEndYear": response_json.get("seriesEndYear"),
-                "imdbRatings": response_json.get("ratings").get("ratings"),
+                "title": response_json.get("title").get("title"),
+                "img": img,
+                "runningTimeInMinutes": response_json.get("title").get("runningTimeInMinutes"),
+                "numberOfEpisodes": response_json.get("title").get("numberOfEpisodes"),
+                "seriesStartYear": response_json.get("title").get("seriesStartYear"),
+                "seriesEndYear": response_json.get("title").get("seriesEndYear"),
+                "imdbRatings": response_json.get("ratings").get("rating"),
                 "genres": response_json.get("genres"),
-                "plotOutline": response_json.get("plotOutline").get("text")
+                "plotOutline": response_json.get("plotSummary").get("text")
 
             }
 
+            print(api_data)
             return Response({"apiData": api_data}, status=status.HTTP_200_OK)
 
 
