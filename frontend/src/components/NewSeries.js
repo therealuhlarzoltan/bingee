@@ -44,7 +44,8 @@ function NewSeries(props) {
                 },
                 body: JSON.stringify({
                     "title_id": id,
-                    "title": seriesData.apiData.title })
+                    "title": seriesData.apiData.title,
+                    "image": seriesData.apiData.img })
             }
             let response = await fetch('/shows/api/add/title/', requestOptions)
             navigate("/")

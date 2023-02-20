@@ -10,6 +10,8 @@ from .utils import make_request, add_series_to_database
 
 from .models import Series, Profile
 
+from .serializers import EpisodeSerializer
+
 import json
 
 # Create your views here.
@@ -95,11 +97,48 @@ class GetTrending(APIView):
     permission_classes = [IsAuthenticated,]
     pass
 
-class GetCurrentlyWatching(ListAPIView):
+class GetCurrentlyWatching(APIView):
     permission_classes = [IsAuthenticated,]
-    pass
+    http_method_names = ['get']
+    
+    def get(self, request, format=None):
+        havent_started_yet = Series.objects.havent_started_yet(user=request.user)
+        currently_watching = Series.objects.currently_watching(user=request.user)
+        havent_watched_for_a_while = Series.objects.havent_watched_for_a_while(user=request.user)
 
-class AddSeries(ListAPIView):
+        next_episodes_currently_watching = []
+        for series in currently_watching:
+            next_episode = Series.objects.find_next_episode(user=request.user, series=series)
+            if next_episode:
+                episode_serializer = EpisodeSerializer(next_episode)
+                next_episode_data = episode_serializer.data
+                next_episodes_currently_watching.append(next_episode_data)
+
+        next_episodes_havent_started_yet = []
+        for series in havent_started_yet:
+            next_episode = Series.objects.find_next_episode(user=request.user, series=series)
+            if next_episode:
+                episode_serializer = EpisodeSerializer(next_episode)
+                next_episode_data = episode_serializer.data
+                next_episodes_havent_started_yet.append(next_episode_data)
+
+        next_episodes_havent_watched_for_a_while = []
+        for series in havent_watched_for_a_while:
+            next_episode = Series.objects.find_next_episode(user=request.user, series=series)
+            if next_episode:
+                episode_serializer = EpisodeSerializer(next_episode)
+                next_episode_data = episode_serializer.data
+                next_episodes_havent_watched_for_a_while.append(next_episode_data)
+
+        
+
+        
+
+        return Response({"haventStartedYet": next_episodes_havent_started_yet, "currentlyWatching": next_episodes_currently_watching, "haventWatchedForAWhile": next_episodes_havent_watched_for_a_while}, status=status.HTTP_200_OK)
+
+
+
+class AddSeries(APIView):
     permission_classes = [IsAuthenticated,]
 
 
@@ -108,6 +147,7 @@ class AddSeries(ListAPIView):
         if request.user:
             title_id = request.data.get('title_id')
             title = request.data.get('title')
+            image = request.data.get("image")
             profile = Profile.objects.get(user=user)
             qs = Series.objects.filter(title_id=title_id)
             if qs.exists():
@@ -115,7 +155,7 @@ class AddSeries(ListAPIView):
                 profile.shows_added.add(series)
                 profile.save()
             else:
-                add_series_to_database(title=title, title_id=title_id)
+                add_series_to_database(title=title, title_id=title_id, image=image)
                 qs = Series.objects.filter(title_id=title_id)
                 if qs.exists():
                     series = qs.first()

@@ -5,11 +5,34 @@ import { useState, useEffect, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 
 import SideDrawer from "./SideDrawer";
+import { json } from "react-router-dom";
 
 
 function HomePageContent(props) {
 
-    let { user } = useContext(AuthContext);
+    let { user, authTokens } = useContext(AuthContext);
+
+    async function GetSeries() {
+        try {
+            const requestOptions = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                }
+            }
+            let response = await fetch('/shows/api/watching/title/', requestOptions)
+            let data = await response.json()
+            console.log(data)
+            
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    GetSeries()
+
+
     return (
         
         <div>
