@@ -2,8 +2,7 @@ import { render } from "react-dom";
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { useParams } from "react-router-dom";
-import { Divider, Grid } from "@mui/material";
+import { Button, Divider, Grid } from "@mui/material";
 import { Box, height } from "@mui/system";
 import SideDrawer from "../components/SideDrawer";
 import { useContext } from "react";
@@ -15,15 +14,45 @@ import { useEffect, useState } from "react";
 import Stack from '@mui/material/Stack';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import { yellow } from "@mui/material/colors";
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+
+import { useParams, useNavigate } from "react-router-dom";
+
 
 function NewSeries(props) {
 
     const [seriesData, setSeriesData] = useState(props.seriesData);
 
+    const { id } = useParams()
+
+    const navigate = useNavigate()
+
     let { user, authTokens } = useContext(AuthContext);
 
     console.log("props: ", props)
     const genres = seriesData.apiData.genres
+
+    async function addSeries() {
+        try {
+            const requestOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                },
+                body: JSON.stringify({
+                    "title_id": id,
+                    "title": seriesData.apiData.title })
+            }
+            let response = await fetch('/shows/api/add/title/', requestOptions)
+            navigate("/")
+            
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
 
 
@@ -53,8 +82,8 @@ function NewSeries(props) {
                         <p style={{color: "gray", paddingLeft: "4px"}}>{seriesData.apiData.plotOutline}</p>
                     <Divider />
                 </Grid>
-                <Grid item xs={9} flexDirection="row">
-                    
+                <Grid item xs={9} flexDirection="row" align="center" style={{"max-width": "100%"}}>
+                    <Button variant="contained" color="primary" sx={{ color: "black", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "white", color: yellow["700"], borderColor: yellow["700"]}, width: "450px", my: 5 }} onClick={addSeries}>Add TV Show <LibraryAddIcon/></Button>
                 </Grid>
                 <Grid item xs={5} flexDirection="column">
                     

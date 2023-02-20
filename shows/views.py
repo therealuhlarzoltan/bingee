@@ -6,9 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
 from rest_framework import status
 
-from .utils import make_request
+from .utils import make_request, add_series_to_database
 
-from .models import Series
+from .models import Series, Profile
 
 import json
 
@@ -38,10 +38,10 @@ class GetSeriesDetails(APIView):
             series = qs.first()
             internal_data = {
                 "title": series.title,
-                "bingeeRatings": 0,
-                "bingeeAdded": 0,
+                "bingeeRatings": -1,
+                "bingeeAdded": -1,
                 "bingeeComments": [],
-                "bingeeRatings": 0,
+                "bingeeRatings": -1,
 
             }
 
@@ -49,12 +49,13 @@ class GetSeriesDetails(APIView):
             response_json = response.json()
 
             api_data = {
-                "img": response_json.get("image").get("url"),
-                "runningTimeInMinutes": response_json.get("runningTimeInMinutes"),
-                "numberOfEpisodes": response_json.get("numberOfEpisodes"),
-                "seriesStartYear": response_json.get("seriesStartYear"),
-                "seriesEndYear": response_json.get("seriesEndYear"),
-                "imdbRatings": response_json.get("ratings").get("ratings"),
+                "title": response_json.get("title").get("title"),
+                "img": response_json.get("title").get("image").get("url"),
+                "runningTimeInMinutes": response_json.get("title").get("runningTimeInMinutes"),
+                "numberOfEpisodes": response_json.get("title").get("numberOfEpisodes"),
+                "seriesStartYear": response_json.get("title").get("seriesStartYear"),
+                "seriesEndYear": response_json.get("title").get("seriesEndYear"),
+                "imdbRatings": response_json.get("ratings").get("rating"),
                 "genres": response_json.get("genres"),
                 "plotOutline": response_json.get("plotSummary").get("text")
 
@@ -85,7 +86,6 @@ class GetSeriesDetails(APIView):
 
             }
 
-            print(api_data)
             return Response({"apiData": api_data}, status=status.HTTP_200_OK)
 
 
@@ -98,4 +98,35 @@ class GetTrending(APIView):
 class GetCurrentlyWatching(ListAPIView):
     permission_classes = [IsAuthenticated,]
     pass
+
+class AddSeries(ListAPIView):
+    permission_classes = [IsAuthenticated,]
+
+
+    def post(self, request, format=None):
+        user = request.user
+        if request.user:
+            title_id = request.data.get('title_id')
+            title = request.data.get('title')
+            profile = Profile.objects.get(user=user)
+            qs = Series.objects.filter(title_id=title_id)
+            if qs.exists():
+                series = qs.first()
+                profile.shows_added.add(series)
+                profile.save()
+            else:
+                add_series_to_database(title=title, title_id=title_id)
+                qs = Series.objects.filter(title_id=title_id)
+                if qs.exists():
+                    series = qs.first()
+                    profile.shows_added.add(series)
+                    profile.save()
+                else:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+
+        return Response(status=status.HTTP_200_OK)
+
 

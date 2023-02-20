@@ -10,15 +10,15 @@ import Button from '@mui/material/Button';
 import Stack from "@mui/material/Stack";
 
 import { useNavigate } from "react-router-dom";
-import { purple, blue, white } from "@mui/material/colors";
+import { purple, blue } from "@mui/material/colors";
 
 
 function Landing() {
 
     const navigate = useNavigate()
     const buttons = [
-        <Button key="Login" variant="contained" sx={{ color: white, backgroundColor: purple['500'], ":hover": { backgroundColor: blue["700"], borderColor: purple["700"] } }} onClick={() => navigate("/login")}>Login</Button>,
-        <Button key="Register" variant="contained" sx={{ color: white, backgroundColor: blue['700'], ":hover": { backgroundColor: purple["700"], borderColor: blue["700"] } }} onClick={() => navigate("/register")}>Register</Button>,
+        <Button key="Login" variant="contained" sx={{ color: "white", backgroundColor: purple['500'], ":hover": { backgroundColor: blue["700"], borderColor: purple["700"] } }} onClick={() => navigate("/login")}>Login</Button>,
+        <Button key="Register" variant="contained" sx={{ color: "white", backgroundColor: blue['700'], ":hover": { backgroundColor: purple["700"], borderColor: blue["700"] } }} onClick={() => navigate("/register")}>Register</Button>,
     ]
 
     return (
