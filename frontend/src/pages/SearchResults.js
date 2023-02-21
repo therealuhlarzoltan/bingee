@@ -96,6 +96,7 @@ function SearchResults(props) {
     }, [q])
 
 
+
     return (
             <Grid container columnSpacing={0} rowSpacing={3}>
                 <Grid item xs={3} flexDirection="column">

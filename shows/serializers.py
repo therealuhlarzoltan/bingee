@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Episode, Series
+from .models import Episode, Series, WatchedEpisode
 
 
 class SeriesSerializer(serializers.ModelSerializer):
@@ -42,3 +42,4 @@ class EpisodeSerializer(serializers.ModelSerializer):
             season_string = seasons
         
         return season_string
+

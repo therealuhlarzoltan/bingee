@@ -6,9 +6,19 @@ import AuthContext from "../context/AuthContext";
 
 import SideDrawer from "./SideDrawer";
 import { json } from "react-router-dom";
+import EpisodeCard from "./EpisodeCard";
+import { Typography } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
+import Divider from "@mui/material/Divider";
 
 
 function HomePageContent(props) {
+
+    const [seriesData, setSeriesData] = useState(null)
+    const [currentKeys, setCurrentKeys] = useState(null)
+    const [notStartedKeys, setNotStartedKeys] = useState(null)
+    const [notWatchedKeys, setNotWatchedKeys] = useState(null)
 
     let { user, authTokens } = useContext(AuthContext);
 
@@ -24,20 +34,79 @@ function HomePageContent(props) {
             let response = await fetch('/shows/api/watching/title/', requestOptions)
             let data = await response.json()
             console.log(data)
+            const currently_watching_keys = Object.keys(data.currentlyWatching)
+            const havent_started_yet_keys = Object.keys(data.haventStartedYet)
+            const havent_watched_for_a_while_keys = Object.keys(data.haventWatchedForAWhile)
+            setSeriesData(data)
+            setCurrentKeys(currently_watching_keys)
+            setNotStartedKeys(havent_started_yet_keys)
+            setNotWatchedKeys(havent_watched_for_a_while_keys)
+            
             
         } catch (error) {
             console.error(error)
         }
     }
 
-    GetSeries()
-
+    if (!seriesData)
+    {
+        GetSeries()
+    }
+    
 
     return (
         
-        <div>
+        <Grid container columnSpacing={0} rowSpacing={3}>
+        <Grid item xs={3} flexDirection="column">
             <SideDrawer firstName={user.firstName} lastName={user.lastName} />
-        </div>
+        </Grid>
+        <Grid item xs={9} flexDirection="column">
+            <Grid item xs={9} flexDirection="row" style={{ "max-width": "100%" }}>
+                <Typography variant="h3" sx={{mb: 2, mx: 2}}>Currently Watching</Typography>
+                <Stack spacing={4} direction="row" flexWrap={"wrap"} sx={{paddingLeft: 2}}>
+                    {seriesData && currentKeys ? 
+                        currentKeys.map(index => {
+                            return (
+                                <EpisodeCard episodeId={seriesData.currentlyWatching[index].episode_id} titleId={seriesData.currentlyWatching[index].series.title_id}
+                                    title={seriesData.currentlyWatching[index].series.title} season={seriesData.currentlyWatching[index].season} episode={seriesData.currentlyWatching[index].episode}
+                                    image={seriesData.currentlyWatching[index].series.image} authTokens={authTokens} setState={setSeriesData} />
+                            );
+                        })
+                    : null}
+                </Stack>
+                <Divider sx={{borderTopWidth: "5px", borderRadius: "5px"}} />
+            </Grid>
+            <Grid item xs={9} flexDirection="row" style={{ "max-width": "100%" }}>
+                <Typography variant="h3" sx={{mb: 2, mx: 2}}>Haven't Watched For a While</Typography>
+                <Stack spacing={4} direction="row" flexWrap={"wrap"} sx={{paddingLeft: 2}}>
+                    {notWatchedKeys ? 
+                        notWatchedKeys.map(index => {
+                            return (
+                                <EpisodeCard episodeId={seriesData.haventWatchedForAWhile[index].episode_id} titleId={seriesData.haventWatchedForAWhile[index].series.title_id}
+                                    title={seriesData.haventWatchedForAWhile[index].series.title} season={seriesData.haventWatchedForAWhile[index].season} episode={seriesData.haventWatchedForAWhile[index].episode}
+                                    image={seriesData.haventWatchedForAWhile[index].series.image} authTokens={authTokens} setState={setSeriesData} />
+                            );
+                        })
+                    : null}
+                </Stack>
+                <Divider sx={{borderTopWidth: "5px", borderRadius: "5px"}} />
+            </Grid>
+            <Grid item xs={9} flexDirection="row" style={{ "max-width": "100%" }}>
+                <Typography variant="h3" sx={{mb: 2, mx: 2}}>Haven't Started Yet</Typography>
+                <Stack spacing={4} direction="row" flexWrap={"wrap"} sx={{paddingLeft: 2}}>
+                    {notStartedKeys ? 
+                        notStartedKeys.map(index => {
+                            return (
+                                <EpisodeCard episodeId={seriesData.haventStartedYet[index].episode_id} titleId={seriesData.haventStartedYet[index].series.title_id}
+                                    title={seriesData.haventStartedYet[index].series.title} season={seriesData.haventStartedYet[index].season} episode={seriesData.haventStartedYet[index].episode}
+                                    image={seriesData.haventStartedYet[index].series.image} authTokens={authTokens} setState={setSeriesData} />
+                            );
+                        })
+                    : null}
+                </Stack>
+            </Grid>
+        </Grid>
+    </Grid>
 
     );
 }

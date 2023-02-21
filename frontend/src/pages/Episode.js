@@ -5,3 +5,5 @@ import ReactDOM from 'react-dom';
 function Episode(props) {
     
 }
+
+export default Episode

@@ -13,6 +13,7 @@ import SearchResults from "../pages/SearchResults";
 
 import PrivateRoute from "../pages/PrivateRoute";
 import Series from "../pages/Series";
+import Episode from "../pages/Episode";
 
 
  const router = createBrowserRouter([
@@ -39,7 +40,11 @@ import Series from "../pages/Series";
    {
     path: "show/:id",
     element: <PrivateRoute route={<Series />} />
-  }
+   },
+   {
+     path: "episode/:id",
+     element: <PrivateRoute route={<Episode/>} />
+   }
 
 ]);
 

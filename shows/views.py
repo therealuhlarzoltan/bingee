@@ -3,12 +3,12 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework import status
 
 from .utils import make_request, add_series_to_database
 
-from .models import Series, Profile
+from .models import Series, Profile, Episode, WatchedEpisode
 
 from .serializers import EpisodeSerializer
 
@@ -130,9 +130,6 @@ class GetCurrentlyWatching(APIView):
                 next_episode_data = episode_serializer.data
                 next_episodes_havent_watched_for_a_while.append(next_episode_data)
 
-        
-
-        
 
         return Response({"haventStartedYet": next_episodes_havent_started_yet, "currentlyWatching": next_episodes_currently_watching, "haventWatchedForAWhile": next_episodes_havent_watched_for_a_while}, status=status.HTTP_200_OK)
 
@@ -168,5 +165,23 @@ class AddSeries(APIView):
         
 
         return Response(status=status.HTTP_200_OK)
+    
+
+class MarkEpisodeWatched(APIView):
+    permission_classes = [IsAuthenticated,]
+    http_method_names = ["post"]
+
+    def post(self, request, format=None):
+        episode_id = request.data.get("episode_id")
+        qs = Episode.objects.filter(episode_id=episode_id)
+        if qs.exists():
+            episode = qs.first()
+            watched = WatchedEpisode.objects.create(profile=request.user.profile, episode=episode, series=episode.series)
+            watched.save()
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 
 
