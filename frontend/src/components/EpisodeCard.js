@@ -50,9 +50,54 @@ function EpisodeCard(props) {
                     })
             }
             let response = await fetch('/shows/api/watch/episode/next/', requestOptions)
-            if (response.ok) {
-                let data = await response.json()
-                setEpisode(data.nextEpisode)
+            if (response.ok)
+            {
+                if (response.status != 204)
+                {
+                    let data = await response.json()
+                    if (data.nextEpisode.episode === "02" && data.nextEpisode.season === "01") {
+                        let seriesData = props.seriesData
+                        const nextEpisode = data.nextEpisode
+                        const index = props.seriesData.haventStartedYet.findIndex(episode => episode.series.title_id === nextEpisode.series.title_id)
+                        props.seriesData.haventStartedYet.splice(index, 1)
+                        const haventStartedYet = props.seriesData.haventStartedYet
+                        let notStartedKeys = Object.keys(haventStartedYet)
+                        props.seriesData.currentlyWatching.push(nextEpisode)
+                        const currentlyWatching = props.seriesData.currentlyWatching
+                        let currentKeys = Object.keys(currentlyWatching)
+                        seriesData.currentlyWatching = currentlyWatching
+                        seriesData.haventStartedYet = haventStartedYet
+                        if (currentKeys.length === 0)
+                        {
+                            currentKeys = null
+                        }
+                        if (notStartedKeys.length === 0)
+                        {
+                            notStartedKeys = null
+                        }
+                        props.setSeriesData(seriesData)
+                        props.setCurrentKeys(currentKeys)
+                        props.setNotStartedKeys(notStartedKeys)
+                    }
+                    else {
+                        setEpisode(data.nextEpisode)
+                    }
+                }
+                else 
+                {
+                    const index = props.seriesData.currentlyWatching.findIndex(episode => episode.series.title_id === episode.series.title_id)
+                    props.seriesData.currentlyWatching.splice(index, 1)
+                    const currentlyWatching = props.seriesData.currentlyWatching
+                    const currentKeys = Object.keys(currentlyWatching)
+                    if (currentKeys.length === 0)
+                    {
+                        currentKeys = null
+                    }
+                    let seriesData = props.seriesData
+                    seriesData.currentlyWatching = currentlyWatching
+                    props.setSeriesData(seriesData)
+                    props.setCurrentKeys(currentKeys)
+                }
             }
         } catch (error) {
             console.error(error)
@@ -75,12 +120,12 @@ function EpisodeCard(props) {
             <CardContent>
                 <Stack direction="column" alignContent="flex-start"  justifyContent="space-around" spacing={0}>
                 <Link to={`/episode/${props?.episodeId}/`} style={{"text-decoration": "none", "color":"black", "margin": "0", "display": "inline"}}>
-                    <Typography gutterBottom variant="h5" sx={{m: 0, display: "inline"}}>
+                    <Typography gutterBottom variant="h5" sx={{m: 0, display: "inline", ":hover": {textDecoration: "underline"}}}>
                         S{episode.season}E{episode.episode}
                     </Typography>
                 </Link>
                 <Link to={`/show/${episode.titleId}/`} style={{"text-decoration": "none", "color":"gray", "margin": "0", "display": "inline"}}>
-                    <Typography gutterBottom variant="h6" sx={{m: 0, display: "inline"}}>
+                    <Typography gutterBottom variant="h6" sx={{m: 0, display: "inline", ":hover": {textDecoration: "underline"}}}>
                         {episode.series.title}
                     </Typography>
                 </Link>

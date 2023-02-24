@@ -195,8 +195,11 @@ class NextEpisode(APIView):
             watched = WatchedEpisode.objects.create(profile=request.user.profile, episode=episode, series=episode.series)
             watched.save()
             next_episode = Series.objects.find_next_episode(user=request.user, series=episode.series)
-            episode_serializer = EpisodeSerializer(next_episode)
-            return Response({"nextEpisode": episode_serializer.data}, status=status.HTTP_201_CREATED)
+            if next_episode:
+                episode_serializer = EpisodeSerializer(next_episode)
+                return Response({"nextEpisode": episode_serializer.data}, status=status.HTTP_201_CREATED)
+            else:
+                return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
