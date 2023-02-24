@@ -53,7 +53,7 @@ function SearchResults(props) {
 
     function DisplaySearchResults(status, data) {
         setSeriesData(data.data)
-        const indexes = Object.keys(data.data).filter(index => data.data[index].titleType === "tvSeries")
+        const indexes = Object.keys(data.data).filter(index => data.data[index].titleType === "tvSeries" || data.data[index].titleType === "tvMiniSeries")
         setSeriesIndex(indexes)
         
 

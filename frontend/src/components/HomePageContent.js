@@ -67,9 +67,7 @@ function HomePageContent(props) {
                     {seriesData && currentKeys ? 
                         currentKeys.map(index => {
                             return (
-                                <EpisodeCard episodeId={seriesData.currentlyWatching[index].episode_id} titleId={seriesData.currentlyWatching[index].series.title_id}
-                                    title={seriesData.currentlyWatching[index].series.title} season={seriesData.currentlyWatching[index].season} episode={seriesData.currentlyWatching[index].episode}
-                                    image={seriesData.currentlyWatching[index].series.image} authTokens={authTokens} setState={setSeriesData} />
+                                <EpisodeCard episode={seriesData.currentlyWatching[index]} />
                             );
                         })
                     : null}
@@ -82,9 +80,7 @@ function HomePageContent(props) {
                     {notWatchedKeys ? 
                         notWatchedKeys.map(index => {
                             return (
-                                <EpisodeCard episodeId={seriesData.haventWatchedForAWhile[index].episode_id} titleId={seriesData.haventWatchedForAWhile[index].series.title_id}
-                                    title={seriesData.haventWatchedForAWhile[index].series.title} season={seriesData.haventWatchedForAWhile[index].season} episode={seriesData.haventWatchedForAWhile[index].episode}
-                                    image={seriesData.haventWatchedForAWhile[index].series.image} authTokens={authTokens} setState={setSeriesData} />
+                                <EpisodeCard episode={seriesData.haventWatchedForAWhile[index].episode_id} />
                             );
                         })
                     : null}
@@ -97,9 +93,7 @@ function HomePageContent(props) {
                     {notStartedKeys ? 
                         notStartedKeys.map(index => {
                             return (
-                                <EpisodeCard episodeId={seriesData.haventStartedYet[index].episode_id} titleId={seriesData.haventStartedYet[index].series.title_id}
-                                    title={seriesData.haventStartedYet[index].series.title} season={seriesData.haventStartedYet[index].season} episode={seriesData.haventStartedYet[index].episode}
-                                    image={seriesData.haventStartedYet[index].series.image} authTokens={authTokens} setState={setSeriesData} />
+                                <EpisodeCard episode={seriesData.haventStartedYet[index]} />
                             );
                         })
                     : null}

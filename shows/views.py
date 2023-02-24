@@ -181,6 +181,24 @@ class MarkEpisodeWatched(APIView):
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+
+class NextEpisode(APIView):
+    permission_classes = [IsAuthenticated,]
+    http_method_names = ["post"]
+
+    def post(self, request, format=None):
+        episode_id = request.data.get("episode_id")
+        qs = Episode.objects.filter(episode_id=episode_id)
+        if qs.exists():
+            episode = qs.first()
+            watched = WatchedEpisode.objects.create(profile=request.user.profile, episode=episode, series=episode.series)
+            watched.save()
+            next_episode = Series.objects.find_next_episode(user=request.user, series=episode.series)
+            episode_serializer = EpisodeSerializer(next_episode)
+            return Response({"nextEpisode": episode_serializer.data}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 
