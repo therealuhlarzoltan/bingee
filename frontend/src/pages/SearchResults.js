@@ -115,7 +115,7 @@ function SearchResults(props) {
                             {seriesIndex ? 
                                 seriesIndex.map(index => {
                                     return (
-                                        <SeriesCard title={seriesData[index]?.title} image={seriesData[index].image?.url} titleId={seriesData[index]?.id.substring(7)} />
+                                        <SeriesCard title={seriesData[index]?.title} image={seriesData[index].image?.url} titleId={seriesData[index]?.id.substring(7)} added={seriesData[index].added} />
                                     );
                                 })
                             : null}

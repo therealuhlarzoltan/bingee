@@ -31,7 +31,6 @@ function NewSeries(props) {
 
     let { user, authTokens } = useContext(AuthContext);
 
-    console.log("props: ", props)
     const genres = seriesData.apiData.genres
 
     async function addSeries() {

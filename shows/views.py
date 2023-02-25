@@ -26,6 +26,14 @@ class SearchByTitle(APIView):
 
         if not data:
             return Response(status=status.HTTP_204_NO_CONTENT)
+            
+        profile = request.user.profile
+        for series in data:
+            if profile.shows_added.filter(title_id=series.get("id")[7:-1]).exists():
+                series['added'] = True
+            else:
+                series['added'] = False
+
 
         return Response({"data":data}, status=status.HTTP_200_OK)
     
@@ -202,6 +210,81 @@ class NextEpisode(APIView):
                 return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+
+class MarkEpisodeUnwatched(APIView):
+
+    permission_classes = [IsAuthenticated,]
+    http_method_names = ["post"]
+
+    def post(self, request, format=None):
+        episode_id = request.data.get("episode_id")
+        qs = Episode.objects.filter(episode_id=episode_id)
+        if qs.exists():
+            episode = qs.first()
+            qs = WatchedEpisode.objects.filter(profile=request.user.profile, episode=episode)
+            if qs.exists():
+                watched = qs.first()
+                watched.delete()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+
+class GetEpisodeDetails(APIView):
+    permission_classes = [IsAuthenticated,]
+    http_method_names = ["post"]
+
+    def post(self, request, format=None):
+        episode_id = request.data.get("episode_id")
+        response = make_request(method="GET", url="https://imdb8.p.rapidapi.com/title/get-details", parameters={"tconst": episode_id}) 
+        response_json = response.json()
+
+        season = str(response_json.get("season"))
+        if len(season) == 1:
+            season = f"0{season}"
+        
+        episode = str(response_json.get("episode"))
+        if len(episode) == 1:
+            episode = f"0{episode}"
+       
+
+        episode_details = {
+            "episodeId": response_json.get("id")[7:-1],
+            "image": response_json.get("image").get("url"),
+            "runningTimeInMinutes": response_json.get("runningTimeInMinutes"),
+            "nextEpisodeId": response_json.get("nextEpisode")[7:-1],
+            "year": response_json.get("year"),
+            "episodeTitle": response_json.get("title"),
+            "seriesTitle": response_json.get("parentTitle").get("title"),
+            "seriesId": response_json.get("parentTitle").get("id")[7:-1],
+            "episode": episode,
+            "season": season
+        }
+
+        return Response({"episode": episode_details}, status=status.HTTP_200_OK)
+    
+
+class RemoveSeries(APIView):
+    permission_classes = [IsAuthenticated,]
+    http_method_names = ["post"]
+
+    def post(self, request, format=None):
+        title_id = request.data.get("title_id")
+        qs = Series.objects.filter(title_id=title_id)
+        if qs.exists():
+            series = qs.first()
+            profile = request.user.profile
+            profile.shows_added.remove(series)
+            qs = WatchedEpisode.objects.filter(profile=profile, series=series)
+            if qs.exists():
+                qs.delete()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 
 

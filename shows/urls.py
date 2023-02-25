@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import SearchByTitle, GetSeriesDetails, AddSeries, GetCurrentlyWatching, MarkEpisodeWatched, NextEpisode
+from .views import SearchByTitle, GetSeriesDetails, AddSeries, GetCurrentlyWatching, MarkEpisodeWatched, NextEpisode, MarkEpisodeUnwatched, RemoveSeries
 
 urlpatterns = [
     path("api/search/title/", SearchByTitle.as_view()),
@@ -9,4 +9,6 @@ urlpatterns = [
     path("api/watching/title/", GetCurrentlyWatching.as_view()),
     path("api/watch/episode/", MarkEpisodeWatched.as_view()),
     path("api/watch/episode/next/", NextEpisode.as_view()),
+    path("api/unwatch/episode/", MarkEpisodeUnwatched.as_view()),
+    path("api/remove/title/", RemoveSeries.as_view()),
 ]

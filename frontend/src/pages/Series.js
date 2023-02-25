@@ -37,10 +37,8 @@ function Series() {
                 body: JSON.stringify({ "title_id": id })
             }
             let response = await fetch('/shows/api/details/title/', requestOptions)
-            console.log("response: ", response)
             if (response.ok) {
                 let data = await response.json()
-                console.log("data: ", data)
                 setSeriesData(data)
             
             }
