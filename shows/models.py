@@ -1,11 +1,9 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 
 import datetime
 
-user_model = get_user_model()
+from accounts.models import  Profile
 
-# Create your models here.
 
 class SeriesManager(models.Manager):
     def havent_started_yet(self, user):
@@ -13,7 +11,7 @@ class SeriesManager(models.Manager):
         watched = WatchedEpisode.objects.filter(profile=profile)
         shows = profile.shows_added.exclude(id__in=[show.series_id for show in watched])
         return shows
-    
+
     def currently_watching(self, user):
         profile = user.profile
         watched = WatchedEpisode.objects.filter(profile=profile, timestamp__range=((datetime.date.today() - datetime.timedelta(days=30)), datetime.datetime.now()))
@@ -25,7 +23,7 @@ class SeriesManager(models.Manager):
         watched = WatchedEpisode.objects.filter(profile=profile).exclude(timestamp__range=((datetime.date.today() - datetime.timedelta(days=30)), datetime.datetime.now()))
         shows = profile.shows_added.filter(id__in=[show.series_id for show in watched])
         return shows
-    
+
     def find_next_episode(self, user, series):
         profile = user.profile
         watched = WatchedEpisode.objects.filter(profile=profile, series=series)
@@ -45,21 +43,12 @@ class SeriesManager(models.Manager):
 class Series(models.Model):
     title = models.CharField(max_length=128, default="")
     title_id = models.CharField(max_length=64, unique=True, default="")
+    rating = models.FloatField(default=0)
     image = models.URLField(null=True)
     objects = SeriesManager()
 
     def __str__(self):
         return self.title
-
-class Profile(models.Model):
-    user = models.OneToOneField(user_model, on_delete=models.CASCADE, primary_key=True)
-    shows_added = models.ManyToManyField(Series)
-    number_of_shows = models.PositiveSmallIntegerField(default=0)
-    number_of_episodes = models.PositiveSmallIntegerField(default=0)
-    date_of_last_watch = models.DateField(blank=True, null=True)
-
-    def __str__(self):
-        return f"@{self.user.username}"
 
 
 class Season(models.Model):
@@ -80,6 +69,7 @@ class Episode(models.Model):
     year = models.PositiveBigIntegerField(default=0)
     series = models.ForeignKey(Series, on_delete=models.CASCADE, null=True)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, null=True, related_name="episodes")
+    rating = models.FloatField(default=0)
 
     def __str__(self):
         return f"{self.episode_title} ({self.series.title})"
@@ -89,9 +79,9 @@ class Episode(models.Model):
 
 
 class WatchedEpisode(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    series = models.ForeignKey(Series, on_delete=models.CASCADE)
-    episode = models.ForeignKey(Episode, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
+    series = models.ForeignKey(Series, on_delete=models.CASCADE, null=True)
+    episode = models.ForeignKey(Episode, on_delete=models.CASCADE, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -101,9 +91,3 @@ class WatchedEpisode(models.Model):
         ordering = ["episode__season__season", "episode__episode"]
 
 
-class EpisodeComment(models.Model):
-    pass
-
-
-class SeriesComment(models.Model):
-    pass

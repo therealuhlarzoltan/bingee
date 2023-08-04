@@ -29,14 +29,13 @@ function Series() {
         setFirstLoad(false)
         try {
             const requestOptions = {
-                method: "POST",
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": 'Bearer ' + String(authTokens?.access)
                 },
-                body: JSON.stringify({ "title_id": id })
             }
-            let response = await fetch('/shows/api/details/title/', requestOptions)
+            let response = await fetch(`/shows/api/details/title/${id}/`, requestOptions)
             if (response.ok) {
                 let data = await response.json()
                 setSeriesData(data)

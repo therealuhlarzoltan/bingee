@@ -65,14 +65,13 @@ function SearchResults(props) {
         setSeriesIndex(null);
         try {
             const requestOptions = {
-                method: "POST",
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": 'Bearer ' + String(authTokens?.access)
-                },
-                body: JSON.stringify({ "q": q })
+                }
             }
-            let response = await fetch('/shows/api/search/title/', requestOptions)
+            let response = await fetch(`/shows/api/search/title/${q}/`, requestOptions)
             if (response.ok) {
                 if (response.status === 204) {
                     console.log("Not found")

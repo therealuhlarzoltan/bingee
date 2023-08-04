@@ -119,12 +119,12 @@ function EpisodeCard(props) {
             />
             <CardContent>
                 <Stack direction="column" alignContent="flex-start"  justifyContent="space-around" spacing={0}>
-                <Link to={`/episode/${props?.episodeId}/`} style={{"text-decoration": "none", "color":"black", "margin": "0", "display": "inline"}}>
+                <Link to={`/episode/${episode.episode_id}/`} style={{"text-decoration": "none", "color":"black", "margin": "0", "display": "inline"}}>
                     <Typography gutterBottom variant="h5" sx={{m: 0, display: "inline", ":hover": {textDecoration: "underline"}}}>
                         S{episode.season}E{episode.episode}
                     </Typography>
                 </Link>
-                <Link to={`/show/${episode.titleId}/`} style={{"text-decoration": "none", "color":"gray", "margin": "0", "display": "inline"}}>
+                <Link to={`/show/${episode.series.title_id}/`} style={{"text-decoration": "none", "color":"gray", "margin": "0", "display": "inline"}}>
                     <Typography gutterBottom variant="h6" sx={{m: 0, display: "inline", ":hover": {textDecoration: "underline"}}}>
                         {episode.series.title}
                     </Typography>

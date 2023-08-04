@@ -8,5 +8,6 @@ urlpatterns = [
     path('logout/', index),
     path('search/<str:q>/', index),
     path('show/<str:id>/', index),
+    path('episode/<str:id>/', index),
     
 ]

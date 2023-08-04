@@ -7,7 +7,8 @@ class SeriesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Series
-        fields = ["title", "title_id", "image"]
+        fields = ["title", "title_id", "image", "rating"]
+
 
 class EpisodeSerializer(serializers.ModelSerializer):
     series = SeriesSerializer()
@@ -15,11 +16,12 @@ class EpisodeSerializer(serializers.ModelSerializer):
     episode = serializers.SerializerMethodField(read_only=True)
     episode_id = serializers.CharField(read_only=True)
     episode_title = serializers.CharField(read_only=True)
+    rating = serializers.FloatField(read_only=True)
 
 
     class Meta:
         model = Episode
-        fields = ["episode_id", "episode_title", "season", "episode", "series"]
+        fields = ["episode_id", "episode_title", "season", "episode", "series", "rating"]
 
     
     def get_episode(self, obj):
@@ -42,4 +44,6 @@ class EpisodeSerializer(serializers.ModelSerializer):
             season_string = seasons
         
         return season_string
+
+
 

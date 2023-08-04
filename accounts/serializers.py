@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from django.conf import settings
 
-from .models import CustomUser
+from .models import CustomUser, Profile
 
 from rest_framework.validators import UniqueValidator
 
@@ -12,7 +12,6 @@ from django.contrib.auth import get_user_model
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
