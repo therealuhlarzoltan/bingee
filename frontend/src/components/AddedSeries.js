@@ -10,6 +10,7 @@ import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import Typography from "@mui/material/Typography";
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
+import TextareaAutosize from '@mui/base/TextareaAutosize';
 
 import { useEffect, useState } from "react";
 
@@ -22,12 +23,13 @@ import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 
 import { useParams, useNavigate } from "react-router-dom";
 import {adjustDateSectionValue} from "@mui/x-date-pickers/internals/hooks/useField/useField.utils";
+import MinHeightTextarea from "./StyledTextArea";
 function AddedSeries(props) {
     const [seriesData, setSeriesData] = useState(props.seriesData);
     const [seriesRatings, setSeriesRatings] = useState(null)
     const [seriesComments, setSeriesComments] = useState(null)
     const [userSeriesRating, setUserSeriesRating] = useState(null)
-    const [userSeriesComment, setUserSeriesComment] = useState(null)
+    const [userSeriesComment, setUserSeriesComment] = useState("")
     const [hover, setHover] = React.useState(-1);
 
     const { id } = useParams()
@@ -102,8 +104,11 @@ function AddedSeries(props) {
     }
 
     async function createComment(id, text) {
+        console.log("function called")
+        console.log("comment to send: ", userSeriesComment)
         if (userSeriesComment && userSeriesComment.length > 4) {
             try {
+                console.log("condition passed")
                 const requestOptions = {
                     method: "POST",
                     headers: {
@@ -146,8 +151,6 @@ function AddedSeries(props) {
             }
         }
     }
-
-
 
     return (
         <Grid container columnSpacing={0} rowSpacing={3}>
@@ -194,11 +197,29 @@ function AddedSeries(props) {
                             }}
                             emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
                         />
-                        <Button variant="contained" sx={{ color: "white", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "black", color: yellow["700"], borderColor: yellow["700"]}}} onSubmit={createRating(id, userSeriesRating)}>Add Rating</Button>
+                        <Button variant="contained" sx={{ color: "white", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "black", color: yellow["700"], borderColor: yellow["700"]}}} onClick={() => createRating(id, userSeriesRating)}>Add Rating</Button>
                     </Box>
                 </Grid>
                 <Grid item xs={4} flexDirection="column">
-                    <Typography variant="h4">Comments</Typography>
+                    <Box sx={{display: 'flex', flexDirection: "column", bgcolor: 'background.paper', borderRadius: 1, p: 1, m: 1, alignItems: "center"}}>
+                        <Typography variant="h4">Comments</Typography>
+                        <TextareaAutosize
+                            value={userSeriesRating}
+                            onChange={event => setUserSeriesComment(event.target.value)}
+                            minRows={3}
+                            placeholder={"Add your comment here"}
+                            sx={{
+                                width: "320px",
+                                fontFamily: "sans-serif",
+                                fontSize: "0.875rem",
+                                fontWeight: "400",
+                                lineHeight: "1.5",
+                                padding: "12px",
+                                borderRadius: "12px 12px 0 12px"
+                            }}
+                        />
+                        <Button variant="contained" sx={{ color: "white", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "black", color: yellow["700"], borderColor: yellow["700"]}}} onClick={() => createComment(id, userSeriesComment)}>Add Comment</Button>
+                    </Box>
                 </Grid>
             </Grid>
         </Grid>
