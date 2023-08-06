@@ -11,6 +11,10 @@ import AuthContext from "../context/AuthContext";
 import Typography from "@mui/material/Typography";
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import TextareaAutosize from '@mui/base/TextareaAutosize';
+import Comment from "./Comment";
+import UserRating from "./UserRating";
+import List from '@mui/joy/List';
+import ListItem from '@mui/joy/ListItem';
 
 import { useEffect, useState } from "react";
 
@@ -26,8 +30,8 @@ import {adjustDateSectionValue} from "@mui/x-date-pickers/internals/hooks/useFie
 import MinHeightTextarea from "./StyledTextArea";
 function AddedSeries(props) {
     const [seriesData, setSeriesData] = useState(props.seriesData);
-    const [seriesRatings, setSeriesRatings] = useState(null)
-    const [seriesComments, setSeriesComments] = useState(null)
+    const [seriesRatings, setSeriesRatings] = useState([])
+    const [seriesComments, setSeriesComments] = useState([])
     const [userSeriesRating, setUserSeriesRating] = useState(null)
     const [userSeriesComment, setUserSeriesComment] = useState("")
     const [hover, setHover] = React.useState(-1);
@@ -38,6 +42,12 @@ function AddedSeries(props) {
 
     let { user, authTokens } = useContext(AuthContext);
 
+    let ratingList = []
+
+    ratingList = seriesRatings.map((rating) =>
+        <UserRating key={rating.id} rating={rating.rating} />
+        //<li key={rating.id}>{rating.rating}</li>
+    )
 
     useEffect(() => {
         loadRatings(id)
@@ -219,6 +229,10 @@ function AddedSeries(props) {
                             }}
                         />
                         <Button variant="contained" sx={{ color: "white", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "black", color: yellow["700"], borderColor: yellow["700"]}}} onClick={() => createComment(id, userSeriesComment)}>Add Comment</Button>
+                        <List>
+                            {ratingList ? ratingList : null}
+                        </List>
+                        <Button onClick={() => {console.log(ratingList); console.log(seriesRatings);}}>Debugger</Button>
                     </Box>
                 </Grid>
             </Grid>

@@ -35,7 +35,7 @@ class SeriesRatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SeriesRating
-        fields = ["rating", "profile", "timestamp"]
+        fields = ["rating", "profile", "timestamp", "id"]
 
 
 class EpisodeCommentCreateSerializer(serializers.ModelSerializer):
@@ -71,7 +71,7 @@ class SeriesCommentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SeriesComment
-        fields = ["profile", "text", "timestamp"]
+        fields = ["profile", "text", "timestamp", "id"]
 
     
 
