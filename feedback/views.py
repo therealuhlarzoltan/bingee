@@ -45,11 +45,14 @@ class RateSeries(CreateAPIView):
             rating_obj = qs.first()
             rating_obj.rating = serializer.data["rating"]
             rating_obj.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            reader_serializer = SeriesRatingSerializer(rating_obj)
+            return Response(reader_serializer.data, status=status.HTTP_200_OK)
         else:
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            created_instance = serializer.instance
+            created_serializer = SeriesRatingSerializer(created_instance)
+            return Response(created_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     
 
@@ -75,7 +78,9 @@ class CommentOnSeries(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        created_instance = serializer.instance
+        created_serializer = SeriesCommentSerializer(created_instance)
+        return Response(created_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 

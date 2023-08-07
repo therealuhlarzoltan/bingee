@@ -33,6 +33,7 @@ class SeriesRatingCreateSerializer(serializers.ModelSerializer):
 
 class SeriesRatingSerializer(serializers.ModelSerializer):
 
+    profile = ProfileSerializer(read_only=True)
     class Meta:
         model = SeriesRating
         fields = ["rating", "profile", "timestamp", "id"]

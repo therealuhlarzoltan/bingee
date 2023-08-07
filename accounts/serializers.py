@@ -68,4 +68,3 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['lastName'] = user.last_name
 
         return token
-

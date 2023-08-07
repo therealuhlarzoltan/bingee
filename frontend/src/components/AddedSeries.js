@@ -42,19 +42,36 @@ function AddedSeries(props) {
 
     let { user, authTokens } = useContext(AuthContext);
 
-    let ratingList = []
+    let ratingList = [];
+    let commentList = [];
 
     ratingList = seriesRatings.map((rating) =>
-        <UserRating key={rating.id} rating={rating.rating} />
-        //<li key={rating.id}>{rating.rating}</li>
+        <ListItem><UserRating key={rating.id} rating={rating.rating} profile={rating.profile} /></ListItem>)
+    commentList = seriesComments.map((comment) =>
+        <ListItem><Comment key={comment.id} text={comment.text} profile={comment.profile}/></ListItem>
     )
 
     useEffect(() => {
         loadRatings(id)
         loadComments(id)
+
     }, []);
 
     const genres = seriesData.apiData.genres
+
+    function sortRatings(ratings) {
+        if (ratings) {
+            const profileId = ratings[0].profile.id
+            ratings.forEach((rating, index) => {
+                if (rating.profile.id === profileId) {
+                    ratings.splice(index, index)
+                }
+            })
+
+            return ratings
+        }
+    }
+
 
     async function removeSeries(){
         try {
@@ -114,11 +131,8 @@ function AddedSeries(props) {
     }
 
     async function createComment(id, text) {
-        console.log("function called")
-        console.log("comment to send: ", userSeriesComment)
         if (userSeriesComment && userSeriesComment.length > 4) {
             try {
-                console.log("condition passed")
                 const requestOptions = {
                     method: "POST",
                     headers: {
@@ -131,6 +145,10 @@ function AddedSeries(props) {
                     })
                 }
                 let response = await fetch('/feedback/api/comment/series/', requestOptions)
+                if (response.status === 201) {
+                    let data = await response.json()
+                    setSeriesComments([data, ...seriesComments])
+                }
             }
             catch (error) {
                 console.error(error)
@@ -155,7 +173,18 @@ function AddedSeries(props) {
                     })
                 }
                 let response = await fetch('/feedback/api/rating/series/', requestOptions)
+                if (response.status === 201) {
+                    let data = await response.json()
+                    setSeriesRatings([data, ...seriesRatings])
+                }
+                else if (response.status === 200) {
+                    let data = await response.json()
+                    let ratings = [data, ...seriesRatings]
+                    ratings = sortRatings(ratings)
+                    setSeriesRatings(ratings)
+                }
             }
+
             catch (error) {
                 console.error(error)
             }
@@ -191,9 +220,10 @@ function AddedSeries(props) {
                 <Grid item xs={9} flexDirection="row" align="center" style={{"max-width": "100%"}}>
                     <Button variant="contained" color="primary" sx={{ color: "black", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "white", color: yellow["700"], borderColor: yellow["700"]}, width: "450px", my: 5 }} onClick={removeSeries}>Remove TV Show <PlaylistRemoveIcon/></Button>
                 </Grid>
+                <Grid container columnSpacing={3} xs={9} sx={{m: 4, p: 4}} style={{ "max-width": "100%" }}>
                 <Grid item xs={5} flexDirection="column">
-                    <Typography variant="h4">Ratings</Typography>
                     <Box sx={{display: 'flex', flexDirection: "column", bgcolor: 'background.paper', borderRadius: 1, p: 1, m: 1, alignItems: "center"}}>
+                        <Typography variant="h2">Ratings</Typography>
                         <Typography variant="subtitle">Add Your Rating!</Typography>
                         <Rating
                             name="hover-feedback"
@@ -208,11 +238,14 @@ function AddedSeries(props) {
                             emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
                         />
                         <Button variant="contained" sx={{ color: "white", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "black", color: yellow["700"], borderColor: yellow["700"]}}} onClick={() => createRating(id, userSeriesRating)}>Add Rating</Button>
+                        <List>
+                            {ratingList ? ratingList : null}
+                        </List>
                     </Box>
                 </Grid>
-                <Grid item xs={4} flexDirection="column">
+                <Grid item xs={5} flexDirection="column">
                     <Box sx={{display: 'flex', flexDirection: "column", bgcolor: 'background.paper', borderRadius: 1, p: 1, m: 1, alignItems: "center"}}>
-                        <Typography variant="h4">Comments</Typography>
+                        <Typography variant="h2">Comments</Typography>
                         <TextareaAutosize
                             value={userSeriesRating}
                             onChange={event => setUserSeriesComment(event.target.value)}
@@ -230,10 +263,11 @@ function AddedSeries(props) {
                         />
                         <Button variant="contained" sx={{ color: "white", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "black", color: yellow["700"], borderColor: yellow["700"]}}} onClick={() => createComment(id, userSeriesComment)}>Add Comment</Button>
                         <List>
-                            {ratingList ? ratingList : null}
+                            {commentList ? commentList : null}
                         </List>
                         <Button onClick={() => {console.log(ratingList); console.log(seriesRatings);}}>Debugger</Button>
                     </Box>
+                </Grid>
                 </Grid>
             </Grid>
         </Grid>

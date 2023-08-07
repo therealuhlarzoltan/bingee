@@ -8,6 +8,7 @@ import ListItem from '@mui/joy/ListItem';
 import Avatar from '@mui/material/Avatar';
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Typography from "@mui/material/Typography";
 
 
 async function replyToComment(id, text) {
@@ -35,12 +36,13 @@ function Comment(props) {
     } = props
 
     return (
-        <Paper elevation={3} sx={{width: "540px", textOverflow: "scroll", borderRadius: "4px"}}>
-            <Box>
+        <Paper elevation={3} sx={{width: "320px", m: 2, p: 2, textOverflow: "scroll", borderRadius: "4px"}}>
+            <Box display={"flex"} flexDirection={"row"} alignItems={"center"} sx={{gap: "6px"}}>
                 <Avatar><FontAwesomeIcon icon="fa-light fa-user" size="xl" /></Avatar>
+                <Link to={"/"} style={{"text-decoration": "none", "color":"black"}}><Typography variant="subtitle" sx={{fontWeight: "bold"}}>@{props?.profile.username}</Typography></Link>
             </Box>
             <Box>
-
+                <Typography variant="paragraph">{props?.text}</Typography>
             </Box>
             <List>
 
