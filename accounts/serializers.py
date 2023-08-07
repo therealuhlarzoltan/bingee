@@ -66,5 +66,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['username'] = user.username
         token['firstName'] = user.first_name
         token['lastName'] = user.last_name
+        token['profileId'] = str(user.profile.id)
 
         return token

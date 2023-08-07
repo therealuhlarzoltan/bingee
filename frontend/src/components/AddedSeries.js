@@ -21,13 +21,14 @@ import { useEffect, useState } from "react";
 import Stack from '@mui/material/Stack';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { yellow } from "@mui/material/colors";
+import { yellow, grey } from "@mui/material/colors";
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 
 import { useParams, useNavigate } from "react-router-dom";
 import {adjustDateSectionValue} from "@mui/x-date-pickers/internals/hooks/useField/useField.utils";
-import MinHeightTextarea from "./StyledTextArea";
+import Paper from "@mui/material/Paper";
+
 function AddedSeries(props) {
     const [seriesData, setSeriesData] = useState(props.seriesData);
     const [seriesRatings, setSeriesRatings] = useState([])
@@ -35,6 +36,7 @@ function AddedSeries(props) {
     const [userSeriesRating, setUserSeriesRating] = useState(null)
     const [userSeriesComment, setUserSeriesComment] = useState("")
     const [hover, setHover] = React.useState(-1);
+    const [originalUserRating, setOriginalUserRating] = useState(0)
 
     const { id } = useParams()
 
@@ -46,7 +48,7 @@ function AddedSeries(props) {
     let commentList = [];
 
     ratingList = seriesRatings.map((rating) =>
-        <ListItem><UserRating key={rating.id} rating={rating.rating} profile={rating.profile} /></ListItem>)
+        <ListItem><UserRating key={rating.id} rating={rating.rating/2} profile={rating.profile} timestamp={rating.timestamp} /></ListItem>)
     commentList = seriesComments.map((comment) =>
         <ListItem><Comment key={comment.id} text={comment.text} profile={comment.profile}/></ListItem>
     )
@@ -70,6 +72,16 @@ function AddedSeries(props) {
 
             return ratings
         }
+    }
+
+    function searchForOwnRating(ratings) {
+        ratings.forEach((rating) =>
+        {
+            if (rating.profile.id === user.profileId) {
+                setUserSeriesRating(rating.rating / 2)
+                setOriginalUserRating(rating.rating / 2)
+            }
+        })
     }
 
 
@@ -103,7 +115,6 @@ function AddedSeries(props) {
             if (response.ok) {
                 let data = await response.json()
                 setSeriesComments(data)
-                console.log(data)
             }
         } catch (error) {
             console.error(error)
@@ -123,7 +134,7 @@ function AddedSeries(props) {
             if (response.ok) {
                 let data = await response.json()
                 setSeriesRatings(data)
-                console.log(data)
+                searchForOwnRating(data)
             }
         } catch (error) {
             console.error(error)
@@ -156,6 +167,34 @@ function AddedSeries(props) {
         }
     }
 
+    async function deleteRating(id) {
+        try {
+            const requestOptions = {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                },
+                body: JSON.stringify({
+                    "title_id": id,
+                })
+            }
+            let response = await fetch(`/feedback/api/rating/series/delete/${id}/`, requestOptions)
+            if (response.status === 204) {
+                let ratings = seriesRatings;
+                ratings.forEach((rating, index) =>
+                    rating.profile.id === user.profileId ? ratings.splice(index, index) : null
+                )
+                setSeriesRatings(ratings)
+                setUserSeriesRating(0)
+            }
+        }
+
+        catch (error) {
+            console.error(error)
+        }
+    }
+
 
 
     async function createRating(id, rating) {
@@ -169,19 +208,21 @@ function AddedSeries(props) {
                     },
                     body: JSON.stringify({
                         "title_id": id,
-                        "rating": rating
+                        "rating": (rating * 2)
                     })
                 }
                 let response = await fetch('/feedback/api/rating/series/', requestOptions)
                 if (response.status === 201) {
                     let data = await response.json()
                     setSeriesRatings([data, ...seriesRatings])
+                    setOriginalUserRating(data.rating/2)
                 }
                 else if (response.status === 200) {
                     let data = await response.json()
                     let ratings = [data, ...seriesRatings]
                     ratings = sortRatings(ratings)
                     setSeriesRatings(ratings)
+                    setOriginalUserRating(data.rating/2)
                 }
             }
 
@@ -223,8 +264,9 @@ function AddedSeries(props) {
                 <Grid container columnSpacing={3} xs={9} sx={{m: 4, p: 4}} style={{ "max-width": "100%" }}>
                 <Grid item xs={5} flexDirection="column">
                     <Box sx={{display: 'flex', flexDirection: "column", bgcolor: 'background.paper', borderRadius: 1, p: 1, m: 1, alignItems: "center"}}>
-                        <Typography variant="h2">Ratings</Typography>
-                        <Typography variant="subtitle">Add Your Rating!</Typography>
+                        <Typography variant="h2" sx={{ mb: 3 }}>Ratings</Typography>
+                        <Paper elevation={5}>
+                            <Box sx={{display: 'flex', flexDirection: "column", borderRadius: 1, p: 1, m: 1, alignItems: "center", width: "320px"}}>
                         <Rating
                             name="hover-feedback"
                             value={userSeriesRating ? userSeriesRating : 0}
@@ -236,8 +278,12 @@ function AddedSeries(props) {
                                 setHover(newHover);
                             }}
                             emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
+                            sx={{mb: 2}}
                         />
-                        <Button variant="contained" sx={{ color: "white", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "black", color: yellow["700"], borderColor: yellow["700"]}}} onClick={() => createRating(id, userSeriesRating)}>Add Rating</Button>
+                        {userSeriesRating === originalUserRating ? <Button variant="contained" sx={{ mb: 2, color: "white", backgroundColor: grey['900'], borderColor: grey['900'], ":hover": { backgroundColor: "black", color: grey["900"], borderColor: grey["900"]}}} onClick={() => deleteRating(id)}>Remove Rating</Button> :
+                        <Button variant="contained" sx={{ mb: 2, color: "white", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "black", color: yellow["700"], borderColor: yellow["700"]}}} onClick={() => createRating(id, userSeriesRating)}>Add Rating</Button>}
+                            </Box>
+                            </Paper>
                         <List>
                             {ratingList ? ratingList : null}
                         </List>
@@ -247,7 +293,7 @@ function AddedSeries(props) {
                     <Box sx={{display: 'flex', flexDirection: "column", bgcolor: 'background.paper', borderRadius: 1, p: 1, m: 1, alignItems: "center"}}>
                         <Typography variant="h2">Comments</Typography>
                         <TextareaAutosize
-                            value={userSeriesRating}
+                            value={userSeriesComment}
                             onChange={event => setUserSeriesComment(event.target.value)}
                             minRows={3}
                             placeholder={"Add your comment here"}
@@ -265,7 +311,6 @@ function AddedSeries(props) {
                         <List>
                             {commentList ? commentList : null}
                         </List>
-                        <Button onClick={() => {console.log(ratingList); console.log(seriesRatings);}}>Debugger</Button>
                     </Box>
                 </Grid>
                 </Grid>

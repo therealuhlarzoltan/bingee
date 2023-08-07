@@ -136,24 +136,24 @@ class DeleteSeriesRating(DestroyAPIView):
     permission_classes = [IsAuthenticated, DoesProfileMatch]
     http_method_names = ["delete"]
     queryset = SeriesRating.objects.all()
-    lookup_url_kwarg = "id"
+    lookup_url_kwarg = "title_id"
 
     def get_object(self):
 
         queryset = self.filter_queryset(self.get_queryset())
 
-        obj = queryset.filter(series__title_id=self.lookup_url_kwarg)
+        obj = queryset.filter(series__title_id=self.kwargs.get(self.lookup_url_kwarg), profile=self.request.user.profile)
 
-        if obj == None:
+        if not obj.exists():
             raise NotFound(detail="Object not found", code=404)
 
+        obj = obj.first()
 
         # May raise a permission denied
         self.check_object_permissions(self.request, obj)
 
         return obj
 
-    pass
 
 
 class DeleteEpisodeRating(DestroyAPIView):

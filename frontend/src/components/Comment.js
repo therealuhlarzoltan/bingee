@@ -32,7 +32,7 @@ async  function editComment() {
 function Comment(props) {
     let { profile, text, timestamp,
         likeEndpoint, replyEndpoint, deleteEndpoint,
-        editEndpoint, profileBaseUrl
+        editEndpoint, profileBaseUrl, user
     } = props
 
     return (

@@ -32,21 +32,19 @@ async  function editComment() {
 
 function UserRating(props) {
     let { profile, rating, timestamp,
-        deleteEndpoint, editEndpoint, profileBaseUrl
+         profileBaseUrl
     } = props
 
     return (
         <Paper elevation={3} sx={{borderRadius: "4px", width: "320px", m : 2, p: 2}}>
-            <Box display={"flex"} flexDirection={"row"} alignItems={"center"} sx={{gap: "6px"}}>
+            <Box display={"flex"} flexDirection={"row"} alignItems={"center"} sx={{gap: "6px", mb: 1}}>
                 <Avatar><FontAwesomeIcon icon="fa-light fa-user" size="xl" /></Avatar>
                 <Link to={"/"} style={{"text-decoration": "none", "color":"black"}}><Typography variant="subtitle" sx={{fontWeight: "bold"}}>@{profile.username}</Typography></Link>
             </Box>
             <Box>
-                <Rating name="read-only" value={rating} readOnly />
+                <Rating name="read-only" value={rating} precision={0.5} readOnly />
             </Box>
-            <List>
-
-            </List>
+            <Box display={"flex"} flexDirection={"row-reverse"}>{props?.timestamp.substring(0, 10)}</Box>
         </Paper>
     )
 }
