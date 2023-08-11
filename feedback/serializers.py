@@ -13,6 +13,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "number_of_shows", "number_of_episodes", "date_of_last_watch"]
 
 
+class EpisodeRatingSerializer(serializers.ModelSerializer):
+
+    profile = ProfileSerializer(read_only=True)
+    class Meta:
+        model = EpisodeRating
+        fields = ["rating", "profile", "timestamp", "id"]
+
+
 class EpisodeRatingCreateSerializer(serializers.ModelSerializer):
     
     episode = serializers.PrimaryKeyRelatedField(queryset=Episode.objects.all())

@@ -17,19 +17,79 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { yellow } from "@mui/material/colors";
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+import List from '@mui/joy/List';
+import ListItem from '@mui/joy/ListItem';
 
 import { useParams, useNavigate } from "react-router-dom";
+import {RatingComponent} from "./RatingComponent";
+import CommentComponent from "./CommentComponent";
 
 
 function NewSeries(props) {
 
     const [seriesData, setSeriesData] = useState(props.seriesData);
+    const [seriesRatings, setSeriesRatings] = useState([])
+    const [seriesComments, setSeriesComments] = useState([])
 
     const { id } = useParams()
 
     const navigate = useNavigate()
 
     let { user, authTokens } = useContext(AuthContext);
+
+    let ratingList = [];
+    let commentList = [];
+
+    ratingList = seriesRatings.map((rating) =>
+        <ListItem><RatingComponent key={rating.id} rating={rating.rating/2} profile={rating.profile} timestamp={rating.timestamp} /></ListItem>)
+    commentList = seriesComments.map((comment) =>
+        <ListItem><CommentComponent key={comment.id} text={comment.text} profile={comment.profile}/></ListItem>
+    )
+
+    useEffect(() => {
+        loadRatings(id)
+        loadComments(id)
+
+    }, []);
+
+    async function loadComments(id) {
+        try {
+            const requestOptions = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                }
+            }
+            let response = await fetch(`/feedback/api/comment/series/get/${id}/`, requestOptions)
+            if (response.ok) {
+                let data = await response.json()
+                setSeriesComments(data)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    async function loadRatings(id) {
+        try {
+            const requestOptions = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                }
+            }
+            let response = await fetch(`/feedback/api/rating/series/get/${id}/`, requestOptions)
+            if (response.ok) {
+                let data = await response.json()
+                setSeriesRatings(data)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
 
     const genres = seriesData.apiData.genres
 
@@ -85,11 +145,23 @@ function NewSeries(props) {
                 <Grid item xs={9} flexDirection="row" align="center" style={{"max-width": "100%"}}>
                     <Button variant="contained" color="primary" sx={{ color: "black", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "white", color: yellow["700"], borderColor: yellow["700"]}, width: "450px", my: 5 }} onClick={addSeries}>Add TV Show <LibraryAddIcon/></Button>
                 </Grid>
-                <Grid item xs={5} flexDirection="column">
-                    
-                </Grid>
-                <Grid item xs={4} flexDirection="column">
-                    
+                <Grid container columnSpacing={3} xs={9} sx={{m: 4, p: 4}} style={{ "max-width": "100%" }}>
+                    <Grid item xs={5} flexDirection="column">
+                        <Box sx={{display: 'flex', flexDirection: "column", bgcolor: 'background.paper', borderRadius: 1, p: 1, m: 1, alignItems: "center"}}>
+                            <Typography variant="h2" sx={{ mb: 3 }}>Ratings</Typography>
+                            <List>
+                                {ratingList ? ratingList : null}
+                            </List>
+                        </Box>
+                    </Grid>
+                    <Grid item xs={5} flexDirection="column">
+                        <Box sx={{display: 'flex', flexDirection: "column", bgcolor: 'background.paper', borderRadius: 1, p: 1, m: 1, alignItems: "center"}}>
+                            <Typography variant="h2">Comments</Typography>
+                            <List>
+                                {commentList ? commentList : null}
+                            </List>
+                        </Box>
+                    </Grid>
                 </Grid>
             </Grid>
         </Grid>

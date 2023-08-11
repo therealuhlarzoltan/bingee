@@ -11,8 +11,8 @@ import AuthContext from "../context/AuthContext";
 import Typography from "@mui/material/Typography";
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import TextareaAutosize from '@mui/base/TextareaAutosize';
-import Comment from "./Comment";
-import UserRating from "./UserRating";
+import CommentComponent from "./CommentComponent";
+import RatingComponent from "./RatingComponent";
 import List from '@mui/joy/List';
 import ListItem from '@mui/joy/ListItem';
 
@@ -48,9 +48,9 @@ function AddedSeries(props) {
     let commentList = [];
 
     ratingList = seriesRatings.map((rating) =>
-        <ListItem><UserRating key={rating.id} rating={rating.rating/2} profile={rating.profile} timestamp={rating.timestamp} /></ListItem>)
+        <ListItem><RatingComponent key={rating.id} rating={rating.rating/2} profile={rating.profile} timestamp={rating.timestamp} /></ListItem>)
     commentList = seriesComments.map((comment) =>
-        <ListItem><Comment key={comment.id} text={comment.text} profile={comment.profile}/></ListItem>
+        <ListItem><CommentComponent key={comment.id} text={comment.text} profile={comment.profile}/></ListItem>
     )
 
     useEffect(() => {

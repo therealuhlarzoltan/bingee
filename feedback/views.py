@@ -3,13 +3,13 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.exceptions import NotFound
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import DjangoModelPermissions
 
-from .serializers import SeriesCommentSerializer, SeriesRatingCreateSerializer, EpisodeCommentSerializer, EpisodeCommentCreateSerializer, SeriesCommentCreateSerializer, EpisodeRatingCreateSerializer, SeriesRatingSerializer
+from .serializers import SeriesCommentSerializer, SeriesRatingCreateSerializer, EpisodeCommentSerializer, EpisodeCommentCreateSerializer, SeriesCommentCreateSerializer, EpisodeRatingCreateSerializer, SeriesRatingSerializer, EpisodeRatingSerializer
 
 from shows.models import Series, Episode
 
@@ -22,6 +22,8 @@ from .permissions import DoesProfileMatch
 import json
 
 # Create your views here.
+
+
 class RateSeries(CreateAPIView):
     permission_classes = [IsAuthenticated,]
     http_method_names = ["post"]
@@ -54,11 +56,9 @@ class RateSeries(CreateAPIView):
             created_serializer = SeriesRatingSerializer(created_instance)
             return Response(created_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    
-
 
 class CommentOnSeries(CreateAPIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, ]
     http_method_names = ["post"]
     serializer_class = SeriesCommentCreateSerializer
     def create(self, request, *args, **kwargs):
@@ -81,9 +81,6 @@ class CommentOnSeries(CreateAPIView):
         created_instance = serializer.instance
         created_serializer = SeriesCommentSerializer(created_instance)
         return Response(created_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-
-
 
 
 class GetSeriesComments(ListAPIView):
@@ -109,18 +106,41 @@ class RateEpisode(CreateAPIView):
             rating_obj = qs.first()
             rating_obj.rating = serializer.data["rating"]
             rating_obj.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            created_serializer = EpisodeRatingSerializer(rating_obj)
+            return Response(created_serializer.data, status=status.HTTP_200_OK)
         else:
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            instance = serializer.instance
+            created_serializer = EpisodeRatingSerializer(instance)
+            return Response(created_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class CommentOnEpisode(CreateAPIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, ]
     http_method_names = ["post"]
-
     serializer_class = EpisodeCommentCreateSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        episode = data.get("episode_id")
+        episode = Episode.objects.filter(episode_id=episode)
+        episode = episode.first()
+        profile = request.user.profile
+        profile = profile.id
+        text = data.get("text")
+        data = {
+            "episode": episode.pk,
+            "profile": profile,
+            "text": text
+        }
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        created_instance = serializer.instance
+        created_serializer = EpisodeCommentSerializer(created_instance)
+        return Response(created_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class GetEpisodeComments(ListAPIView):
@@ -157,30 +177,75 @@ class DeleteSeriesRating(DestroyAPIView):
 
 
 class DeleteEpisodeRating(DestroyAPIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, DoesProfileMatch]
     http_method_names = ["delete"]
     queryset = EpisodeRating.objects.all()
+    lookup_url_kwarg = "episode_id"
 
-    pass
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        obj = queryset.filter(episode__episode_id=self.kwargs.get(self.lookup_url_kwarg),
+                              profile=self.request.user.profile)
+
+        if not obj.exists():
+            raise NotFound(detail="Object not found", code=404)
+
+        obj = obj.first()
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
 
 class DeleteSeriesComment(DestroyAPIView):
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, DoesProfileMatch]
     http_method_names = ["delete"]
     queryset = SeriesComment.objects.all()
+    lookup_url_kwarg = "id"
 
-    pass
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        obj = queryset.filter(id=self.kwargs.get(self.lookup_url_kwarg),
+                              profile=self.request.user.profile)
+
+        if not obj.exists():
+            raise NotFound(detail="Object not found", code=404)
+
+        obj = obj.first()
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
 
 class DeleteEpisodeComment(DestroyAPIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, DoesProfileMatch]
     http_method_names = ["delete"]
     queryset = EpisodeComment.objects.all()
+    lookup_url_kwarg = "id"
 
-    pass
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        obj = queryset.filter(id=self.kwargs.get(self.lookup_url_kwarg),
+                              profile=self.request.user.profile)
+
+        if not obj.exists():
+            raise NotFound(detail="Object not found", code=404)
+
+        obj = obj.first()
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
 
-class GetSeriesRatings(ListAPIView) :
+class GetSeriesRatings(ListAPIView):
     permission_classes = [IsAuthenticated, ]
     http_method_names = ["get"]
     queryset = SeriesRating.objects.all()
@@ -188,6 +253,32 @@ class GetSeriesRatings(ListAPIView) :
     serializer_class = SeriesRatingSerializer
 
 
+class EditSeriesComment(UpdateAPIView):
+    permission_classes = [IsAuthenticated, DoesProfileMatch]
+    http_method_names = ["put"]
+    lookup_url_kwarg = "id"
+    queryset = SeriesComment.objects.all()
+    serializer_class = SeriesCommentCreateSerializer
 
-    
+    def get_object(self):
+        queryset = self.get_queryset()
+        id = self.kwargs.get(self.lookup_url_kwarg)
+        queryset = queryset.filter(id=id)
 
+        if not queryset.exists():
+            raise NotFound(detail="Object not found", code=404)
+
+        obj = queryset.first()
+
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+
+
+class EditEpisodeComment(UpdateAPIView):
+    permission_classes = [IsAuthenticated, DoesProfileMatch]
+    http_method_names = ["put"]
+    lookup_url_kwarg = "id"
+    queryset = EpisodeComment.objects.all()
+    serializer_class = EpisodeCommentCreateSerializer

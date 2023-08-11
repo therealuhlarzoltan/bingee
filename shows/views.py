@@ -37,7 +37,7 @@ class SearchByTitle(APIView):
 
 
         return Response({"data": data}, status=status.HTTP_200_OK)
-    
+
 
 class GetSeriesDetails(APIView):
     permission_classes = [IsAuthenticated]
@@ -76,7 +76,7 @@ class GetSeriesDetails(APIView):
             }
 
             return Response({"internalData": internal_data, "apiData": api_data}, status=status.HTTP_200_OK)
-        
+
         else:
 
             response = make_request("GET", "https://imdb8.p.rapidapi.com/title/get-overview-details", {"tconst": title_id})
@@ -111,7 +111,7 @@ class GetTrending(APIView):
 class GetCurrentlyWatching(APIView):
     permission_classes = [IsAuthenticated, ]
     http_method_names = ['get']
-    
+
     def get(self, request, format=None):
         havent_started_yet = Series.objects.havent_started_yet(user=request.user)
         currently_watching = Series.objects.currently_watching(user=request.user)
@@ -175,7 +175,7 @@ class AddSeries(APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         return Response(status=status.HTTP_200_OK)
-    
+
 
 class MarkEpisodeWatched(APIView):
     permission_classes = [IsAuthenticated, ]
@@ -194,7 +194,7 @@ class MarkEpisodeWatched(APIView):
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
+
 
 class NextEpisode(APIView):
     permission_classes = [IsAuthenticated, ]
@@ -215,10 +215,9 @@ class NextEpisode(APIView):
                 return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
+
 
 class MarkEpisodeUnwatched(APIView):
-
     permission_classes = [IsAuthenticated, ]
     http_method_names = ["delete"]
 
@@ -239,14 +238,14 @@ class MarkEpisodeUnwatched(APIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
+
 
 class GetEpisodeDetails(APIView):
     permission_classes = [IsAuthenticated,]
     http_method_names = ["get"]
 
     def get(self, request, episode_id):
-        response = make_request(method="GET", url="https://imdb8.p.rapidapi.com/title/get-details", parameters={"tconst": episode_id}) 
+        response = make_request(method="GET", url="https://imdb8.p.rapidapi.com/title/get-details", parameters={"tconst": episode_id})
         response_json = response.json()
 
         response2 = make_request(method="GET", url="https://imdb8.p.rapidapi.com/title/get-plots", parameters={"tconst": episode_id})
@@ -255,10 +254,24 @@ class GetEpisodeDetails(APIView):
         season = str(response_json.get("season"))
         if len(season) == 1:
             season = f"0{season}"
-        
+
         episode = str(response_json.get("episode"))
         if len(episode) == 1:
             episode = f"0{episode}"
+
+        qs = Episode.objects.filter(episode_id=episode_id)
+        if qs.exists():
+            profile = request.user.profile
+            series = qs.first().series
+            internal_data = {
+                "added": series in profile.shows_added.all(),
+                "title": series.title,
+                # "bingeeRatings": -1,
+                # "bingeeAdded": -1,
+                # "bingeeComments": [],
+                # "bingeeRatings": -1,
+
+            }
 
         episode_details = {
             "episodeId": response_json.get("id")[7:-1],
@@ -272,11 +285,11 @@ class GetEpisodeDetails(APIView):
             "episode": episode,
             "season": season,
             "plotSummary": response_json2.get("plots")[0].get("text"),
-            
+
         }
 
-        return Response({"episode": episode_details}, status=status.HTTP_200_OK)
-    
+        return Response({"episode": episode_details, "internalData":internal_data}, status=status.HTTP_200_OK)
+
 
 class RemoveSeries(APIView):
     permission_classes = [IsAuthenticated, ]
