@@ -147,7 +147,8 @@ class GetEpisodeComments(ListAPIView):
     permission_classes = [IsAuthenticated, ]
     http_method_names = ["get"]
     lookup_url_kwarg = "episode_id"
-    queryset = Episode.objects.filter(episode_id=lookup_url_kwarg)
+    lookup_field = "episode_id"
+    queryset = EpisodeComment.objects.all()
 
     serializer_class = EpisodeCommentSerializer
 

@@ -88,6 +88,7 @@ function AddedEpisode(props) {
             let response = await fetch(`/feedback/api/comment/episode/get/${id}/`, requestOptions)
             if (response.ok) {
                 let data = await response.json()
+                console.log(data)
                 setEpisodeComments(data)
             }
         } catch (error) {
@@ -107,6 +108,7 @@ function AddedEpisode(props) {
             let response = await fetch(`/feedback/api/rating/episode/get/${id}/`, requestOptions)
             if (response.ok) {
                 let data = await response.json()
+                console.log(data)
                 setEpisodeRatings(data)
                 searchForOwnRating(data)
             }
@@ -162,6 +164,99 @@ function AddedEpisode(props) {
         loadComments(id)
         loadRatings(id)
     }, [])
+
+    async function createComment(id, text) {
+        console.log("Making comment")
+        if (userEpisodeComment && userEpisodeComment.length > 4) {
+            console.log("text: ", userEpisodeComment)
+            try {
+                const requestOptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": 'Bearer ' + String(authTokens?.access)
+                    },
+                    body: JSON.stringify({
+                        "episode_id": id,
+                        "text": text,
+                    })
+                }
+                let response = await fetch('/feedback/api/comment/episode/', requestOptions)
+                if (response.status === 201) {
+                    let data = await response.json()
+                    setEpisodeComments([data, ...episodeComments])
+                }
+            }
+            catch (error) {
+                console.error(error)
+            }
+        }
+    }
+
+    async function deleteRating(id) {
+        try {
+            const requestOptions = {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                },
+                body: JSON.stringify({
+                    "episode_id": id,
+                })
+            }
+            let response = await fetch(`/feedback/api/rating/episode/delete/${id}/`, requestOptions)
+            if (response.status === 204) {
+                let ratings = episodeRatings;
+                ratings.forEach((rating, index) =>
+                    rating.profile.id === user.profileId ? ratings.splice(index, index) : null
+                )
+                setEpisodeRatings(ratings)
+                setUserEpisodeRating(0)
+            }
+        }
+
+        catch (error) {
+            console.error(error)
+        }
+    }
+
+
+
+    async function createRating(id, rating) {
+        if (userEpisodeRating) {
+            try {
+                const requestOptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": 'Bearer ' + String(authTokens?.access)
+                    },
+                    body: JSON.stringify({
+                        "episode_id": id,
+                        "rating": (rating * 2)
+                    })
+                }
+                let response = await fetch('/feedback/api/rating/episode/', requestOptions)
+                if (response.status === 201) {
+                    let data = await response.json()
+                    setEpisodeRatings([data, ...episodeRatings])
+                    setOriginalUserRating(data.rating/2)
+                }
+                else if (response.status === 200) {
+                    let data = await response.json()
+                    let ratings = [data, ...episodeRatings]
+                    ratings = sortRatings(ratings)
+                    setEpisodeRatings(ratings)
+                    setOriginalUserRating(data.rating/2)
+                }
+            }
+
+            catch (error) {
+                console.error(error)
+            }
+        }
+    }
 
     return (
         <Grid container columnSpacing={0} rowSpacing={3}>
