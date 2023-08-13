@@ -47,5 +47,5 @@ class EpisodeRating(models.Model):
     def save(self, *args, **kwargs):
         super().save(args, kwargs)
         rating = EpisodeRating.objects.filter(episode=self.episode).aggregate(Avg("rating"))
-        self.episode.rating = rating
+        self.episode.rating = rating.get("rating__avg")
         self.episode.save()

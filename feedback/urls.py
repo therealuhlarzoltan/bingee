@@ -2,7 +2,8 @@ from django.urls import path
 
 from .views import (RateSeries, RateEpisode, CommentOnSeries, CommentOnEpisode, GetSeriesComments,
                     GetEpisodeComments, DeleteSeriesRating, DeleteEpisodeRating, DeleteSeriesComment,
-                    DeleteEpisodeComment, GetSeriesRatings, EditEpisodeComment, EditSeriesComment)
+                    DeleteEpisodeComment, GetSeriesRatings, EditEpisodeComment, EditSeriesComment,
+                    GetEpisodeRatings)
 
 urlpatterns = [
     path("api/rating/series/", RateSeries.as_view()),
@@ -18,5 +19,5 @@ urlpatterns = [
     path("api/comment/series/delete/<uuid:id>/", DeleteSeriesComment.as_view()),
     path("api/comment/episode/delete/<uuid:id>/", DeleteEpisodeComment.as_view()),
     path("api/rating/series/get/<str:title_id>/", GetSeriesRatings.as_view()),
-    path("api/rating/episode/get/<str:episode_id>/", GetSeriesRatings.as_view()),
+    path("api/rating/episode/get/<str:episode_id>/", GetEpisodeRatings.as_view()),
 ]

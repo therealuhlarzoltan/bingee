@@ -183,7 +183,7 @@ function AddedSeries(props) {
             if (response.status === 204) {
                 let ratings = seriesRatings;
                 ratings.forEach((rating, index) =>
-                    rating.profile.id === user.profileId ? ratings.splice(index, index) : null
+                    rating.profile.id === user.profileId ? ratings.splice(index, 1) : null
                 )
                 setSeriesRatings(ratings)
                 setUserSeriesRating(0)

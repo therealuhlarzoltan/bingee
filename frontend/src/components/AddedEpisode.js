@@ -208,9 +208,11 @@ function AddedEpisode(props) {
             let response = await fetch(`/feedback/api/rating/episode/delete/${id}/`, requestOptions)
             if (response.status === 204) {
                 let ratings = episodeRatings;
+                console.log("Current ratings: ", ratings)
                 ratings.forEach((rating, index) =>
-                    rating.profile.id === user.profileId ? ratings.splice(index, index) : null
+                    rating.profile.id === user.profileId ? ratings.splice(index, 1) : null
                 )
+                console.log("New ratings: ", ratings)
                 setEpisodeRatings(ratings)
                 setUserEpisodeRating(0)
             }
@@ -304,7 +306,7 @@ function AddedEpisode(props) {
                                         sx={{mb: 2}}
                                     />
                                     {userEpisodeRating === originalUserRating ? <Button variant="contained" sx={{ mb: 2, color: "white", backgroundColor: grey['900'], borderColor: grey['900'], ":hover": { backgroundColor: "black", color: grey["900"], borderColor: grey["900"]}}} onClick={() => deleteRating(id)}>Remove Rating</Button> :
-                                        <Button variant="contained" sx={{ mb: 2, color: "white", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "black", color: yellow["700"], borderColor: yellow["700"]}}} onClick={() => createRating(id, userEpsiodeRating)}>Add Rating</Button>}
+                                        <Button variant="contained" sx={{ mb: 2, color: "white", backgroundColor: yellow['700'], borderColor: yellow['700'], ":hover": { backgroundColor: "black", color: yellow["700"], borderColor: yellow["700"]}}} onClick={() => createRating(id, userEpisodeRating)}>Add Rating</Button>}
                                 </Box>
                             </Paper>
                             <List>

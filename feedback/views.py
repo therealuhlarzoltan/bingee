@@ -98,8 +98,16 @@ class RateEpisode(CreateAPIView):
     serializer_class = EpisodeRatingCreateSerializer
 
     def create(self, request, *args, **kwargs):
-        episode_id = self.request.get("episode_id")
-        serializer = self.get_serializer(data=request.data)
+        episode_id = request.data.get("episode_id")
+        episode = Episode.objects.filter(episode_id=episode_id)
+        if episode.exists():
+            episode = episode.first()
+        else:
+            raise NotFound("Object with id not found", code=404)
+        data = request.data
+        data["episode"] = episode.pk
+        data["profile"] = request.user.profile.pk
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         qs = EpisodeRating.objects.filter(profile=request.user.profile, episode__episode_id=episode_id)
         if qs.exists():
@@ -283,3 +291,12 @@ class EditEpisodeComment(UpdateAPIView):
     lookup_url_kwarg = "id"
     queryset = EpisodeComment.objects.all()
     serializer_class = EpisodeCommentCreateSerializer
+
+
+class GetEpisodeRatings(ListAPIView):
+    permission_classes = [IsAuthenticated, ]
+    http_method_names = ["get"]
+    queryset = EpisodeRating.objects.all()
+    lookup_url_kwarg = "episode_id"
+    lookup_field = "episode_id"
+    serializer_class = EpisodeRatingSerializer
