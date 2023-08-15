@@ -41,9 +41,13 @@ function NewSeries(props) {
     let commentList = [];
 
     ratingList = seriesRatings.map((rating) =>
-        <ListItem><RatingComponent key={rating.id} rating={rating.rating/2} profile={rating.profile} timestamp={rating.timestamp} /></ListItem>)
+        <ListItem><RatingComponent key={rating.id} rating={rating.rating/2} profile={rating.profile} timestamp={rating.timestamp}
+                                    user={user}/></ListItem>)
     commentList = seriesComments.map((comment) =>
-        <ListItem><CommentComponent key={comment.id} text={comment.text} profile={comment.profile}/></ListItem>
+        <ListItem><CommentComponent key={comment.id} text={comment.text} profile={comment.profile} timestamp={comment.timestamp}
+                                    user={user} comment={comment.id} authTokens={authTokens}
+                                    likes={comment.likes} areReplies={comment.areReplies}
+                                    isLiked={comment.isLiked} episodeOrSeries="series"/></ListItem>
     )
 
     useEffect(() => {

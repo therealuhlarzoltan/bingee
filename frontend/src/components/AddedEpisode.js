@@ -48,9 +48,12 @@ function AddedEpisode(props) {
     let commentList = [];
 
     ratingList = episodeRatings.map((rating) =>
-        <ListItem><RatingComponent key={rating.id} rating={rating.rating/2} profile={rating.profile} timestamp={rating.timestamp} /></ListItem>)
+        <ListItem><RatingComponent key={rating.id} rating={rating.rating/2} profile={rating.profile} timestamp={rating.timestamp}
+                                    user={user}/></ListItem>)
     commentList = episodeComments.map((comment) =>
-        <ListItem><CommentComponent key={comment.id} text={comment.text} profile={comment.profile}/></ListItem>
+        <ListItem><CommentComponent key={comment.id} text={comment.text} profile={comment.profile}
+                                    timestamp={comment.timestamp} user={user} id={comment.id} authTokens={authTokens} likes={comment.likes} areReplies={comment.areReplies}
+                                    isLiked={comment.isLiked} episodeOrSeries="episode" likeCount={comment.likes}/></ListItem>
     )
 
     function sortRatings(ratings) {
@@ -208,11 +211,9 @@ function AddedEpisode(props) {
             let response = await fetch(`/feedback/api/rating/episode/delete/${id}/`, requestOptions)
             if (response.status === 204) {
                 let ratings = episodeRatings;
-                console.log("Current ratings: ", ratings)
                 ratings.forEach((rating, index) =>
                     rating.profile.id === user.profileId ? ratings.splice(index, 1) : null
                 )
-                console.log("New ratings: ", ratings)
                 setEpisodeRatings(ratings)
                 setUserEpisodeRating(0)
             }

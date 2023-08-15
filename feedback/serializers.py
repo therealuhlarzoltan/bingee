@@ -68,19 +68,43 @@ class SeriesCommentCreateSerializer(serializers.ModelSerializer):
 class EpisodeCommentSerializer(serializers.ModelSerializer):
     
     profile = ProfileSerializer(read_only=True)
+    isLiked = serializers.SerializerMethodField(read_only=True)
+    likes = serializers.SerializerMethodField(read_only=True)
+    areReplies = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = EpisodeComment
-        fields = ["profile", "text", "timestamp"]
+        fields = ["profile", "text", "timestamp", "id", "isLiked", "likes", "areReplies"]
+
+    def get_isLiked(self, obj):
+        return obj.profile in obj.likes.all()
+
+    def get_likes(self, obj):
+        return obj.likes.all().count()
+
+    def get_areReplies(self, obj):
+        return obj.likes.all().count() != 0
 
 
 class SeriesCommentSerializer(serializers.ModelSerializer):
 
     profile = ProfileSerializer(read_only=True)
+    isLiked = serializers.SerializerMethodField(read_only=True)
+    likes = serializers.SerializerMethodField(read_only=True)
+    areReplies = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = SeriesComment
-        fields = ["profile", "text", "timestamp", "id"]
+        fields = ["profile", "text", "timestamp", "id", "isLiked", "likes", "areReplies"]
+
+    def get_isLiked(self, obj):
+        return obj.profile in obj.likes.all()
+
+    def get_likes(self, obj):
+        return obj.likes.all().count()
+
+    def get_areReplies(self, obj):
+        return obj.likes.all().count() != 0
 
     
 

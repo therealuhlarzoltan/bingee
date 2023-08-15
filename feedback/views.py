@@ -300,3 +300,82 @@ class GetEpisodeRatings(ListAPIView):
     lookup_url_kwarg = "episode_id"
     lookup_field = "episode_id"
     serializer_class = EpisodeRatingSerializer
+
+
+class LikeEpisodeComment(APIView):
+    permission_classes = [IsAuthenticated, ]
+    http_method_names = ["post", "delete"]
+    look_up_url_kwarg = "comment_id"
+
+    def post(self, request, *args, **kwargs):
+        comment = EpisodeComment.objects.filter(id=kwargs.get(self.look_up_url_kwarg))
+        if not comment.exists():
+            return Response({"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+        comment = comment.first()
+        profile = request.user.profile
+        if profile in comment.likes.all():
+            return Response({"message": "Already liked"}, status=status.HTTP_208_ALREADY_REPORTED)
+        comment.likes.add(profile)
+        likes = comment.likes.all().count()
+        return Response({"likes": likes}, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        comment = EpisodeComment.objects.filter(id=kwargs.get(self.look_up_url_kwarg))
+        if not comment.exists():
+            return Response({"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+        comment = comment.first()
+        profile = request.user.profile
+        if profile not in comment.likes.all():
+            return Response({"message": "Not liked"}, status=status.HTTP_208_ALREADY_REPORTED)
+        comment.likes.remove(profile)
+        likes = comment.likes.all().count()
+        return Response({"likes": likes}, status=status.HTTP_200_OK)
+
+class LikeSeriesComment(APIView):
+    permission_classes = [IsAuthenticated, ]
+    http_method_names = ["post", "delete"]
+    look_up_url_kwarg = "comment_id"
+
+    def post(self, request, *args, **kwargs):
+        comment = SeriesComment.objects.filter(id=kwargs.get(self.look_up_url_kwarg))
+        if not comment.exists():
+            return Response({"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+        comment = comment.first()
+        profile = request.user.profile
+        if profile in comment.likes.all():
+            return Response({"message": "Already liked"}, status=status.HTTP_208_ALREADY_REPORTED)
+        comment.likes.add(profile)
+        likes = comment.likes.all().count()
+        return Response({"likes": likes}, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        comment = SeriesComment.objects.filter(id=kwargs.get(self.look_up_url_kwarg))
+        if not comment.exists():
+            return Response({"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+        comment = comment.first()
+        profile = request.user.profile
+        if profile not in comment.likes.all():
+            return Response({"message": "Not liked"}, status=status.HTTP_208_ALREADY_REPORTED)
+        comment.likes.remove(profile)
+        likes = comment.likes.all().count()
+        return Response({"likes": likes}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ReplyToSeriesComment(CreateAPIView):
+    pass
+
+
+class ReplyToEpisodeComment(CreateAPIView):
+    pass
+
+
+class ListEpisodeCommentReplies(ListAPIView):
+    pass
+
+
+class ListSeriesCommentReplies(ListAPIView):
+    pass
+
+
+
+

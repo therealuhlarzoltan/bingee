@@ -11,25 +11,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Rating from '@mui/material/Rating';
 import Typography from "@mui/material/Typography";
 
-
-async function replyToComment(id, text) {
-
-}
-
-async function likeComment(id)  {
-
-}
-
-async function deleteComment(id) {
-
-}
-
-async  function editComment() {
-
-}
-
-
-
 function RatingComponent(props) {
     let { profile, rating, timestamp,
          profileBaseUrl
@@ -38,7 +19,7 @@ function RatingComponent(props) {
     return (
         <Paper elevation={3} sx={{borderRadius: "4px", width: "320px", m : 2, p: 2}}>
             <Box display={"flex"} flexDirection={"row"} alignItems={"center"} sx={{gap: "6px", mb: 1}}>
-                <Avatar><FontAwesomeIcon icon="fa-light fa-user" size="xl" /></Avatar>
+                <Avatar><i className="fa-regular fa-user fa-lg"/></Avatar>
                 <Link to={"/"} style={{"text-decoration": "none", "color":"black"}}><Typography variant="subtitle" sx={{fontWeight: "bold"}}>@{profile.username}</Typography></Link>
             </Box>
             <Box>

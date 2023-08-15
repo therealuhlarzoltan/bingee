@@ -13,6 +13,8 @@ class EpisodeComment(models.Model):
     text = models.TextField(max_length=300)
     episode = models.ForeignKey(Episode, on_delete=models.CASCADE, blank=True, null=True, default=0)
     timestamp = models.DateTimeField(auto_now_add=True)
+    likes = models.ManyToManyField(Profile, blank=True, related_name="liked_episode_comments")
+    reply_to = models.ForeignKey("EpisodeComment", blank=True, null=True, on_delete=models.CASCADE)
 
 
 class SeriesComment(models.Model):
@@ -21,6 +23,8 @@ class SeriesComment(models.Model):
     text = models.TextField(max_length=300)
     series = models.ForeignKey(Series, on_delete=models.CASCADE, blank=True, null=True, default=0)
     timestamp = models.DateTimeField(auto_now_add=True)
+    likes = models.ManyToManyField(Profile, blank=True, related_name="liked_series_comments")
+    reply_to = models.ForeignKey("SeriesComment", blank=True, null=True, on_delete=models.CASCADE)
 
 
 class SeriesRating(models.Model):
