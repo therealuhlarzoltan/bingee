@@ -21,16 +21,56 @@ function CommentComponent(props) {
     const [isLiked, setIsLiked] = useState(props?.isLiked)
     const [likeCount, setLikeCount] = useState(props?.likeCount)
     const [isEditing, setIsEditing] = useState(false)
+    const [isReplying, setIsReplying] = useState(false)
+    const [replyText, setReplyText] = useState("")
     const [editedText, setEditedText] = useState(props?.text)
     const [text, setText] = useState(props?.text)
     const [timestamp, setTimestamp] = useState(props?.timestamp)
 
     let { profile, authTokens, user,
-        areReplies, id, episodeOrSeries, otherComments, setComments
+        areReplies, id, episodeOrSeries, otherComments, setComments, replyId
     } = props
 
-    async function replyToComment(id, text) {
-
+    async function replyToComment(parentId, commentId, text) {
+        if (replyText && replyText.length >= 4) {
+            let requestOptions;
+            try {
+                if (episodeOrSeries === "episode") {
+                    requestOptions = {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": 'Bearer ' + String(authTokens?.access)
+                        },
+                        body: JSON.stringify({
+                            "episode_id": parentId,
+                            "reply_to": commentId,
+                            "text": text
+                        })
+                    }
+                } else if (episodeOrSeries === "series") {
+                    requestOptions = {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": 'Bearer ' + String(authTokens?.access)
+                        },
+                        body: JSON.stringify({
+                            "title_id": parentId,
+                            "reply_to": commentId,
+                            "text": text
+                        })
+                    }
+                }
+                let response = await fetch(`/feedback/api/comment/${episodeOrSeries}/`, requestOptions)
+                if (response.status === 201) {
+                    let data = await response.json()
+                }
+            }
+            catch (error) {
+                console.error(error)
+            }
+        }
     }
 
     async function likeComment(id)  {
@@ -125,7 +165,27 @@ function CommentComponent(props) {
         }
     }
 
+    async function getReplies(id) {
+        try {
+            const requestOptions = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                }
+            }
+            let response = await fetch(`/feedback/api/${episodeOrSeries}/comment/replies/get/${id}/`, requestOptions)
+            if (response.ok) {
+                let data = await response.json()
+                console.log("qs: ", data)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     return (
+        <>
         <Paper elevation={3} sx={{width: "320px", m: 2, p: 2, textOverflow: "scroll", borderRadius: "4px"}}>
             <Box display={"flex"} flexDirection={"row"} alignItems={"center"} sx={{gap: "6px"}}>
                 <Avatar><i className="fa-regular fa-user fa-lg"/></Avatar>
@@ -168,13 +228,51 @@ function CommentComponent(props) {
             <Box display={"flex"} flexDirection={"row-reverse"}>{timestamp?.substring(0, 10)}</Box>
             <List orientation="horizontal">
                 <ListItem><span style={{"cursor":"pointer", "margin-right":"5px"}}>{ isLiked ? <i className="fa-solid fa-heart fa-lg" onClick={() => likeComment(id)}></i> : <i className="fa-regular fa-heart fa-lg" onClick={() => likeComment(id)} />}</span>{likeCount}</ListItem>
-                <ListItem><span style={{"cursor":"pointer"}}><i className="fa-solid fa-reply"></i></span></ListItem>
-                { areReplies ? <ListItem><span style={{"cursor":"pointer"}}><i className="fa-solid fa-arrow-down-short-wide fa-lg"></i></span></ListItem> : null }
+                <ListItem><span style={{"cursor":"pointer"}} onClick={() => setIsReplying(true)}><i className="fa-solid fa-reply"></i></span></ListItem>
+                { areReplies ? <ListItem><span style={{"cursor":"pointer"}} onClick={() => getReplies(id)}><i className="fa-solid fa-arrow-down-short-wide fa-lg"></i></span></ListItem> : null }
                 {profile.id === user.profileId ? <ListItem><span style={{"cursor":"pointer"}} onClick={() => setIsEditing(true)}> <i className="fa-solid fa-pen-to-square"></i></span></ListItem>: null}
                 {profile.id === user.profileId ? <ListItem><span style={{"cursor":"pointer"}}><i className="fa-solid fa-trash" onClick={() => deleteComment(id)}></i></span></ListItem> : null}
             </List>
             </>}
         </Paper>
+            { isReplying && <>
+                <Paper elevation={3} sx={{width: "320px", m: 2, p: 2, textOverflow: "scroll", borderRadius: "4px"}}>
+                    <Box display={"flex"} flexDirection={"row"} alignItems={"center"} sx={{gap: "6px"}}>
+                        <Avatar><i className="fa-regular fa-user fa-lg"/></Avatar>
+                        <Link to={"/"} style={{"text-decoration": "none", "color":"black"}}><Typography variant="subtitle" sx={{fontWeight: "bold"}}>@{props?.profile.username}</Typography></Link>
+                    </Box>
+                    <Box>
+                    <TextareaAutosize
+                        value={replyText}
+                        onChange={event => setReplyText(event.target.value)}
+                        minRows={3}
+                        placeholder={`Replying to @${profile?.username}`}
+                        sx={{
+                            width: "320px",
+                            fontFamily: "sans-serif",
+                            fontSize: "0.875rem",
+                            fontWeight: "400",
+                            lineHeight: "1.5",
+                            padding: "12px",
+                            borderRadius: "12px 12px 0 12px"
+                        }}
+                    />
+                </Box>
+                <List orientation="horizontal">
+                    <ListItem>
+                        <Button size={"small"} onClick={() => {replyToComment(replyId, id, replyText);}} variant="contained" endIcon={<DoneIcon />}>
+                            Done
+                        </Button>
+                    </ListItem>
+                    <ListItem>
+                        <Button size={"small"} onClick={() => {setReplyText(""), setIsReplying(false)}} variant="outlined" startIcon={<ClearIcon />}>
+                            Discard
+                        </Button>
+                    </ListItem>
+                </List>
+                </Paper>
+            </> }
+        </>
     )
 }
 

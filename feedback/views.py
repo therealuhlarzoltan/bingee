@@ -86,7 +86,7 @@ class GetSeriesComments(ListAPIView):
     permission_classes = [IsAuthenticated,]
     http_method_names = ["get"]
     lookup_url_kwarg = "title_id"
-    queryset = SeriesComment.objects.all()
+    queryset = SeriesComment.objects.filter(reply_to=None)
 
     serializer_class = SeriesCommentSerializer
 
@@ -136,10 +136,12 @@ class CommentOnEpisode(CreateAPIView):
         profile = request.user.profile
         profile = profile.id
         text = data.get("text")
+        reply_to = data.get("reply_to")
         data = {
             "episode": episode.pk,
             "profile": profile,
-            "text": text
+            "text": text,
+            "reply_to": reply_to
         }
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
@@ -155,7 +157,7 @@ class GetEpisodeComments(ListAPIView):
     http_method_names = ["get"]
     lookup_url_kwarg = "episode_id"
     lookup_field = "episode_id"
-    queryset = EpisodeComment.objects.all()
+    queryset = EpisodeComment.objects.filter(reply_to=None)
 
     serializer_class = EpisodeCommentSerializer
 
@@ -380,20 +382,27 @@ class LikeSeriesComment(APIView):
         return Response({"likes": likes}, status=status.HTTP_204_NO_CONTENT)
 
 
-class ReplyToSeriesComment(CreateAPIView):
-    pass
-
-
-class ReplyToEpisodeComment(CreateAPIView):
-    pass
-
-
 class ListEpisodeCommentReplies(ListAPIView):
-    pass
+    permission_classes = [IsAuthenticated, ]
+    http_method_names = ["get"]
+    lookup_url_kwarg = "comment_id"
+    serializer_class = EpisodeCommentSerializer
+    queryset = EpisodeComment.objects.all()
+
+    def get_queryset(self):
+        return EpisodeComment.objects.filter(reply_to=self.kwargs.get(self.lookup_url_kwarg))
+
 
 
 class ListSeriesCommentReplies(ListAPIView):
-    pass
+    permission_classes = [IsAuthenticated, ]
+    http_method_names = ["get"]
+    lookup_url_kwarg = "comment_id"
+    serializer_class = SeriesCommentSerializer
+    queryset = SeriesComment.objects.all()
+
+    def get_queryset(self):
+        return SeriesComment.objects.filter(reply_to=self.kwargs.get(self.lookup_url_kwarg))
 
 
 

@@ -53,7 +53,7 @@ class EpisodeCommentCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EpisodeComment
-        fields = ["text", "profile", "episode", "timestamp"]
+        fields = ["text", "profile", "episode", "timestamp", "reply_to"]
 
 
 class SeriesCommentCreateSerializer(serializers.ModelSerializer):
@@ -62,7 +62,7 @@ class SeriesCommentCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SeriesComment
-        fields = ["text", "profile", "series", "timestamp"]
+        fields = ["text", "profile", "series", "timestamp", "reply_to"]
 
 
 class EpisodeCommentSerializer(serializers.ModelSerializer):
@@ -83,7 +83,9 @@ class EpisodeCommentSerializer(serializers.ModelSerializer):
         return obj.likes.all().count()
 
     def get_areReplies(self, obj):
-        return obj.likes.all().count() != 0
+        comments = EpisodeComment.objects.all()
+        qs = comments.filter(reply_to=obj.id)
+        return qs.exists()
 
 
 class SeriesCommentSerializer(serializers.ModelSerializer):
@@ -104,7 +106,9 @@ class SeriesCommentSerializer(serializers.ModelSerializer):
         return obj.likes.all().count()
 
     def get_areReplies(self, obj):
-        return obj.likes.all().count() != 0
+        comments = SeriesComment.objects.all()
+        qs = comments.filter(reply_to=obj.id)
+        return qs.exists()
 
     
 

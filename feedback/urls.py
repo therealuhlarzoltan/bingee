@@ -4,7 +4,7 @@ from .views import (RateSeries, RateEpisode, CommentOnSeries, CommentOnEpisode, 
                     GetEpisodeComments, DeleteSeriesRating, DeleteEpisodeRating, DeleteSeriesComment,
                     DeleteEpisodeComment, GetSeriesRatings, EditEpisodeComment, EditSeriesComment,
                     GetEpisodeRatings, LikeEpisodeComment, LikeSeriesComment, ListEpisodeCommentReplies,
-                    ListSeriesCommentReplies, ReplyToSeriesComment, ReplyToEpisodeComment)
+                    ListSeriesCommentReplies)
 
 urlpatterns = [
     path("api/rating/series/", RateSeries.as_view()),
@@ -22,9 +22,7 @@ urlpatterns = [
     path("api/rating/series/get/<str:title_id>/", GetSeriesRatings.as_view()),
     path("api/rating/episode/get/<str:episode_id>/", GetEpisodeRatings.as_view()),
     path("api/like/episode/comment/<uuid:comment_id>/", LikeEpisodeComment.as_view()),
-    path("api/episode/comment/reply/", ReplyToEpisodeComment.as_view()),
     path("api/like/series/comment/<uuid:comment_id>/", LikeSeriesComment.as_view()),
-    path("api/series/comment/reply/", ReplyToSeriesComment.as_view()),
     path("api/series/comment/replies/get/<uuid:comment_id>/", ListSeriesCommentReplies.as_view()),
     path("api/episode/comment/replies/get/<uuid:comment_id>/", ListEpisodeCommentReplies.as_view())
 ]

@@ -54,7 +54,7 @@ function AddedEpisode(props) {
         <ListItem><CommentComponent key={comment.id} text={comment.text} profile={comment.profile}
                                     timestamp={comment.timestamp} user={user} id={comment.id} authTokens={authTokens} likes={comment.likes} areReplies={comment.areReplies}
                                     isLiked={comment.isLiked} episodeOrSeries="episode" likeCount={comment.likes}
-                                    otherComments={episodeComments} setComments={setEpisodeComments}/></ListItem>
+                                    otherComments={episodeComments} setComments={setEpisodeComments} replyId={id}/></ListItem>
     )
 
     function sortRatings(ratings) {
