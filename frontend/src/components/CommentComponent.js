@@ -9,15 +9,24 @@ import Avatar from '@mui/material/Avatar';
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Typography from "@mui/material/Typography";
+import TextareaAutosize from "@mui/base/TextareaAutosize";
+import DoneIcon from '@mui/icons-material/Done';
+import ClearIcon from '@mui/icons-material/Clear';
+import Button from '@mui/material/Button';
+
 
 
 function CommentComponent(props) {
 
     const [isLiked, setIsLiked] = useState(props?.isLiked)
     const [likeCount, setLikeCount] = useState(props?.likeCount)
+    const [isEditing, setIsEditing] = useState(false)
+    const [editedText, setEditedText] = useState(props?.text)
+    const [text, setText] = useState(props?.text)
+    const [timestamp, setTimestamp] = useState(props?.timestamp)
 
-    let { profile, text, timestamp, authTokens, user,
-        areReplies, id, episodeOrSeries
+    let { profile, authTokens, user,
+        areReplies, id, episodeOrSeries, otherComments, setComments
     } = props
 
     async function replyToComment(id, text) {
@@ -61,11 +70,59 @@ function CommentComponent(props) {
     }
 
     async function deleteComment(id) {
+        try {
+            const requestOptions = {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                }
+            }
+            let response = await fetch(`/feedback/api/comment/${episodeOrSeries}/delete/${id}/`, requestOptions)
+            if (response.status === 204) {
+                otherComments.forEach((comment, index) =>
+                    {
+                        if (comment.id === id) {
+                            otherComments.splice(index, 1)
+                        }
+                    }
+                )
+                const newState = [...otherComments]
+                setComments(newState)
 
+
+            }
+        } catch (error) {
+            console.error(error)
+        }
     }
 
-    async  function editComment() {
+    async  function editComment(id, text) {
+        try {
+            const requestOptions = {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                },
+                body: JSON.stringify({
+                    "text": text
+                })
+            }
+            let response = await fetch(`/feedback/api/comment/${episodeOrSeries}/edit/${id}/`, requestOptions)
+            if (response.ok)
+            {
+                let data = await response.json()
+                setText(data.text)
+                setTimestamp(data.timestamp)
+                setIsLiked(data.isLiked)
+                setLikeCount(data.likes)
+                setIsEditing(false)
+            }
 
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (
@@ -74,17 +131,49 @@ function CommentComponent(props) {
                 <Avatar><i className="fa-regular fa-user fa-lg"/></Avatar>
                 <Link to={"/"} style={{"text-decoration": "none", "color":"black"}}><Typography variant="subtitle" sx={{fontWeight: "bold"}}>@{props?.profile.username}</Typography></Link>
             </Box>
+            { isEditing ? <>
+                <Box>
+                    <TextareaAutosize
+                        value={editedText}
+                        onChange={event => setEditedText(event.target.value)}
+                        minRows={3}
+                        placeholder={"Edit your comment here"}
+                        sx={{
+                            width: "320px",
+                            fontFamily: "sans-serif",
+                            fontSize: "0.875rem",
+                            fontWeight: "400",
+                            lineHeight: "1.5",
+                            padding: "12px",
+                            borderRadius: "12px 12px 0 12px"
+                        }}
+                    />
+                </Box>
+                <List orientation="horizontal">
+                    <ListItem>
+                        <Button size={"small"} onClick={() => {editComment(id, editedText);}} variant="contained" endIcon={<DoneIcon />}>
+                            Done
+                        </Button>
+                    </ListItem>
+                    <ListItem>
+                        <Button size={"small"} onClick={() => {setEditedText(text), setIsEditing(false)}} variant="outlined" startIcon={<ClearIcon />}>
+                            Discard
+                        </Button>
+                    </ListItem>
+                </List>
+            </> : <>
             <Box>
-                <Typography variant="paragraph">{props?.text}</Typography>
+                <Typography variant="paragraph">{text}</Typography>
             </Box>
             <Box display={"flex"} flexDirection={"row-reverse"}>{timestamp?.substring(0, 10)}</Box>
             <List orientation="horizontal">
                 <ListItem><span style={{"cursor":"pointer", "margin-right":"5px"}}>{ isLiked ? <i className="fa-solid fa-heart fa-lg" onClick={() => likeComment(id)}></i> : <i className="fa-regular fa-heart fa-lg" onClick={() => likeComment(id)} />}</span>{likeCount}</ListItem>
                 <ListItem><span style={{"cursor":"pointer"}}><i className="fa-solid fa-reply"></i></span></ListItem>
                 { areReplies ? <ListItem><span style={{"cursor":"pointer"}}><i className="fa-solid fa-arrow-down-short-wide fa-lg"></i></span></ListItem> : null }
-                {profile.id === user.profileId ? <ListItem><span style={{"cursor":"pointer"}}> <i className="fa-solid fa-pen-to-square"></i></span></ListItem>: null}
-                {profile.id === user.profileId ? <ListItem><span style={{"cursor":"pointer"}}><i className="fa-solid fa-trash"></i></span></ListItem> : null}
+                {profile.id === user.profileId ? <ListItem><span style={{"cursor":"pointer"}} onClick={() => setIsEditing(true)}> <i className="fa-solid fa-pen-to-square"></i></span></ListItem>: null}
+                {profile.id === user.profileId ? <ListItem><span style={{"cursor":"pointer"}}><i className="fa-solid fa-trash" onClick={() => deleteComment(id)}></i></span></ListItem> : null}
             </List>
+            </>}
         </Paper>
     )
 }

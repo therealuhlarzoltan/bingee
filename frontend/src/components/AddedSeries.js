@@ -53,7 +53,8 @@ function AddedSeries(props) {
     commentList = seriesComments.map((comment) =>
         <ListItem><CommentComponent key={comment.id} text={comment.text} profile={comment.profile} timestamp={comment.timestamp}
                                     user={user} id={comment.id} authTokens={authTokens} likes={comment.likes} areReplies={comment.areReplies}
-                                    isLiked={comment.isLiked} episodeOrSeries="series" /></ListItem>
+                                    isLiked={comment.isLiked} episodeOrSeries="series"
+                                    otherComments={seriesComments} setComments={setSeriesComments}/></ListItem>
     )
 
     useEffect(() => {
@@ -145,7 +146,7 @@ function AddedSeries(props) {
     }
 
     async function createComment(id, text) {
-        if (userSeriesComment && userSeriesComment.length > 4) {
+        if (userSeriesComment && userSeriesComment.length >= 4) {
             try {
                 const requestOptions = {
                     method: "POST",

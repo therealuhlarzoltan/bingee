@@ -48,7 +48,8 @@ function NewEpisode(props) {
     commentList = episodeComments.map((comment) =>
         <ListItem><CommentComponent key={comment.id} text={comment.text} profile={comment.profile} timestamp={comment.timestamp}
                                     user={user} id={comment.id} authTokens={authTokens} likes={comment.likes} areReplies={comment.areReplies}
-                                    isLiked={comment.isLiked} episodeOrSeries="episode"/></ListItem>
+                                    isLiked={comment.isLiked} episodeOrSeries="episode"
+                                    otherComments={episodeComments} setComments={setEpisodeComments}/></ListItem>
     )
 
     async function loadComments(id) {
@@ -63,7 +64,6 @@ function NewEpisode(props) {
             let response = await fetch(`/feedback/api/comment/episode/get/${id}/`, requestOptions)
             if (response.ok) {
                 let data = await response.json()
-                console.log(data)
                 setEpisodeComments(data)
             }
         } catch (error) {
@@ -83,7 +83,6 @@ function NewEpisode(props) {
             let response = await fetch(`/feedback/api/rating/episode/get/${id}/`, requestOptions)
             if (response.ok) {
                 let data = await response.json()
-                console.log(data)
                 setEpisodeRatings(data)
             }
         } catch (error) {

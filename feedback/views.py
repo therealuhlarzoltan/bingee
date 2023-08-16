@@ -4,9 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import DjangoModelPermissions
 
 from .serializers import SeriesCommentSerializer, SeriesRatingCreateSerializer, EpisodeCommentSerializer, EpisodeCommentCreateSerializer, SeriesCommentCreateSerializer, EpisodeRatingCreateSerializer, SeriesRatingSerializer, EpisodeRatingSerializer
@@ -212,7 +211,8 @@ class DeleteSeriesComment(DestroyAPIView):
     permission_classes = [IsAuthenticated, DoesProfileMatch]
     http_method_names = ["delete"]
     queryset = SeriesComment.objects.all()
-    lookup_url_kwarg = "id"
+    lookup_url_kwarg = "comment_id"
+    lookup_field = "id"
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
@@ -235,7 +235,8 @@ class DeleteEpisodeComment(DestroyAPIView):
     permission_classes = [IsAuthenticated, DoesProfileMatch]
     http_method_names = ["delete"]
     queryset = EpisodeComment.objects.all()
-    lookup_url_kwarg = "id"
+    lookup_url_kwarg = "comment_id"
+    lookup_field = "id"
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
@@ -262,35 +263,53 @@ class GetSeriesRatings(ListAPIView):
     serializer_class = SeriesRatingSerializer
 
 
-class EditSeriesComment(UpdateAPIView):
-    permission_classes = [IsAuthenticated, DoesProfileMatch]
+class EditSeriesComment(APIView):
+    permission_classes = [IsAuthenticated, ]
     http_method_names = ["put"]
-    lookup_url_kwarg = "id"
-    queryset = SeriesComment.objects.all()
-    serializer_class = SeriesCommentCreateSerializer
+    lookup_url_kwarg = "comment_id"
 
-    def get_object(self):
-        queryset = self.get_queryset()
-        id = self.kwargs.get(self.lookup_url_kwarg)
-        queryset = queryset.filter(id=id)
+    def put(self, request, *args, **kwargs):
+        comment = SeriesComment.objects.filter(id=kwargs.get(self.lookup_url_kwarg))
+        if not comment.exists():
+            raise NotFound("Object not found", code=404)
+        comment = comment.first()
+        if request.user.profile != comment.profile:
+            raise PermissionDenied(code=403)
+        text = request.data.get("text")
+        if text is not None:
+            if len(text) >= 4:
+                comment.text = text
+                comment.save()
+                serializer = SeriesCommentSerializer(instance=comment)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            raise ValidationError("Minimum length is 4", code=411)
+        raise ValidationError("Validation failed", code=400)
 
-        if not queryset.exists():
-            raise NotFound(detail="Object not found", code=404)
 
-        obj = queryset.first()
-
-        self.check_object_permissions(self.request, obj)
-
-        return obj
 
 
 
 class EditEpisodeComment(UpdateAPIView):
-    permission_classes = [IsAuthenticated, DoesProfileMatch]
+    permission_classes = [IsAuthenticated, ]
     http_method_names = ["put"]
-    lookup_url_kwarg = "id"
-    queryset = EpisodeComment.objects.all()
-    serializer_class = EpisodeCommentCreateSerializer
+    lookup_url_kwarg = "comment_id"
+
+    def put(self, request, *args, **kwargs):
+        comment = EpisodeComment.objects.filter(id=kwargs.get(self.lookup_url_kwarg))
+        if not comment.exists():
+            raise NotFound("Object not found", code=404)
+        comment = comment.first()
+        if request.user.profile != comment.profile:
+            raise PermissionDenied(code=403)
+        text = request.data.get("text")
+        if text is not None:
+            if len(text) >= 4:
+                comment.text = text
+                comment.save()
+                serializer = EpisodeCommentSerializer(instance=comment)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            raise ValidationError("Minimum length is 4", code=411)
+        raise ValidationError("Validation failed", code=400)
 
 
 class GetEpisodeRatings(ListAPIView):

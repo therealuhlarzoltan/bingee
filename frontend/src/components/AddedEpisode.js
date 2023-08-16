@@ -53,7 +53,8 @@ function AddedEpisode(props) {
     commentList = episodeComments.map((comment) =>
         <ListItem><CommentComponent key={comment.id} text={comment.text} profile={comment.profile}
                                     timestamp={comment.timestamp} user={user} id={comment.id} authTokens={authTokens} likes={comment.likes} areReplies={comment.areReplies}
-                                    isLiked={comment.isLiked} episodeOrSeries="episode" likeCount={comment.likes}/></ListItem>
+                                    isLiked={comment.isLiked} episodeOrSeries="episode" likeCount={comment.likes}
+                                    otherComments={episodeComments} setComments={setEpisodeComments}/></ListItem>
     )
 
     function sortRatings(ratings) {
@@ -91,7 +92,6 @@ function AddedEpisode(props) {
             let response = await fetch(`/feedback/api/comment/episode/get/${id}/`, requestOptions)
             if (response.ok) {
                 let data = await response.json()
-                console.log(data)
                 setEpisodeComments(data)
             }
         } catch (error) {
@@ -111,7 +111,6 @@ function AddedEpisode(props) {
             let response = await fetch(`/feedback/api/rating/episode/get/${id}/`, requestOptions)
             if (response.ok) {
                 let data = await response.json()
-                console.log(data)
                 setEpisodeRatings(data)
                 searchForOwnRating(data)
             }
@@ -154,7 +153,6 @@ function AddedEpisode(props) {
             if (response.ok)
             {
                 let data = await response.json()
-                console.log(data)
                 setInternalEpisodeDetails(data.episode)
             }
 
@@ -169,9 +167,7 @@ function AddedEpisode(props) {
     }, [])
 
     async function createComment(id, text) {
-        console.log("Making comment")
-        if (userEpisodeComment && userEpisodeComment.length > 4) {
-            console.log("text: ", userEpisodeComment)
+        if (userEpisodeComment && userEpisodeComment.length >= 4) {
             try {
                 const requestOptions = {
                     method: "POST",
