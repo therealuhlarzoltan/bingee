@@ -26,11 +26,28 @@ function CommentComponent(props) {
     const [editedText, setEditedText] = useState(props?.text)
     const [text, setText] = useState(props?.text)
     const [timestamp, setTimestamp] = useState(props?.timestamp)
+    const [replies, setReplies] = useState(null)
+    const [isDisplayingReplies, setIsDisplayingReplies] = useState(false)
 
     let { profile, authTokens, user,
         areReplies, id, episodeOrSeries, otherComments, setComments, replyId
     } = props
 
+    let replyList = []
+
+    if (replies) {
+        replyList = replies.map((comment) =>
+            <CommentComponent key={comment.id} text={comment.text}
+               profile={comment.profile}
+               timestamp={comment.timestamp} user={user} id={comment.id}
+               authTokens={authTokens} likes={comment.likes}
+               areReplies={comment.areReplies}
+               isLiked={comment.isLiked}
+               episodeOrSeries={episodeOrSeries}
+               likeCount={comment.likes}
+               otherComments={replies} setComments={setReplies}
+               replyId={replyId}/>)
+    }
     async function replyToComment(parentId, commentId, text) {
         if (replyText && replyText.length >= 4) {
             let requestOptions;
@@ -65,6 +82,8 @@ function CommentComponent(props) {
                 let response = await fetch(`/feedback/api/comment/${episodeOrSeries}/`, requestOptions)
                 if (response.status === 201) {
                     let data = await response.json()
+                    setIsReplying(false)
+                    getReplies(id)
                 }
             }
             catch (error) {
@@ -177,7 +196,8 @@ function CommentComponent(props) {
             let response = await fetch(`/feedback/api/${episodeOrSeries}/comment/replies/get/${id}/`, requestOptions)
             if (response.ok) {
                 let data = await response.json()
-                console.log("qs: ", data)
+                setReplies(data)
+                setIsDisplayingReplies(true)
             }
         } catch (error) {
             console.error(error)
@@ -185,7 +205,7 @@ function CommentComponent(props) {
     }
 
     return (
-        <>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <Paper elevation={3} sx={{width: "320px", m: 2, p: 2, textOverflow: "scroll", borderRadius: "4px"}}>
             <Box display={"flex"} flexDirection={"row"} alignItems={"center"} sx={{gap: "6px"}}>
                 <Avatar><i className="fa-regular fa-user fa-lg"/></Avatar>
@@ -226,10 +246,10 @@ function CommentComponent(props) {
                 <Typography variant="paragraph">{text}</Typography>
             </Box>
             <Box display={"flex"} flexDirection={"row-reverse"}>{timestamp?.substring(0, 10)}</Box>
-            <List orientation="horizontal">
+            <List orientation="horizontal" sx={{ marginBottom: 0 }}>
                 <ListItem><span style={{"cursor":"pointer", "margin-right":"5px"}}>{ isLiked ? <i className="fa-solid fa-heart fa-lg" onClick={() => likeComment(id)}></i> : <i className="fa-regular fa-heart fa-lg" onClick={() => likeComment(id)} />}</span>{likeCount}</ListItem>
                 <ListItem><span style={{"cursor":"pointer"}} onClick={() => setIsReplying(true)}><i className="fa-solid fa-reply"></i></span></ListItem>
-                { areReplies ? <ListItem><span style={{"cursor":"pointer"}} onClick={() => getReplies(id)}><i className="fa-solid fa-arrow-down-short-wide fa-lg"></i></span></ListItem> : null }
+                { areReplies ? <ListItem> { isDisplayingReplies ? <span style={{"cursor":"pointer"}} onClick={() => setIsDisplayingReplies(false)}><i className="fa-solid fa-arrow-up-short-wide fa-lg"></i></span> : <span style={{"cursor":"pointer"}} onClick={() => getReplies(id)}><i className="fa-solid fa-arrow-down-short-wide fa-lg"></i></span>}</ListItem> : null }
                 {profile.id === user.profileId ? <ListItem><span style={{"cursor":"pointer"}} onClick={() => setIsEditing(true)}> <i className="fa-solid fa-pen-to-square"></i></span></ListItem>: null}
                 {profile.id === user.profileId ? <ListItem><span style={{"cursor":"pointer"}}><i className="fa-solid fa-trash" onClick={() => deleteComment(id)}></i></span></ListItem> : null}
             </List>
@@ -272,7 +292,11 @@ function CommentComponent(props) {
                 </List>
                 </Paper>
             </> }
-        </>
+                { isDisplayingReplies && <Paper sx={{marginTop: 0}} elevation={5}><Box sx={{display: "flex", flexDirection: "column", justifyContent: "flex-end", marginTop: 0}}>
+                    {replyList}
+                </Box></Paper>
+                }
+        </Box>
     )
 }
 
