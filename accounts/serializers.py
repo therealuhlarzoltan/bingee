@@ -69,3 +69,30 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['profileId'] = str(user.profile.id)
 
         return token
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    country = serializers.CharField(required=True)
+    gender = serializers.CharField(required=True)
+    birth_date = serializers.DateField(required=True)
+    email = serializers.EmailField(required=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    class Meta:
+        model = CustomUser
+        fields = ["username", "first_name", "last_name", "email", "gender", "country", "birth_date"]
+
+    def validate(self, attrs):
+        if (len(attrs.get("last_name")) > 16):
+            raise serializers.ValidationError({"last_name": "This field cannot be longer than 16 characters"})
+        if (len(attrs.get("first_name")) > 16):
+            raise serializers.ValidationError({"last_name": "This field cannot be longer than 16 characters"})
+        if not any(country[0] == attrs.get("country") for country in settings.COUNTRY_CHOICES):
+            raise serializers.ValidationError({"country":"Country must be a valid choice"})
+        if not any(gender[0] == attrs.get("gender") for gender in settings.GENDER_CHOICES):
+            raise serializers.ValidationError({"gender":"Gender must be a valid choice"})
+        email_qs = CustomUser.objects.filter(email=attrs.get("email"))
+        if email_qs.exists():
+            raise serializers.ValidationError({"email": "A user with this email address already exists"})
+        return  super().validate(attrs)
+

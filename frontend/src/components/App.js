@@ -14,6 +14,8 @@ import SearchResults from "../pages/SearchResults";
 import PrivateRoute from "../pages/PrivateRoute";
 import Series from "../pages/Series";
 import Episode from "../pages/Episode";
+import Profile from "../pages/Profile";
+import Settings from "../pages/Settings";
 
 
  const router = createBrowserRouter([
@@ -37,14 +39,22 @@ import Episode from "../pages/Episode";
      path: "search/:q",
      element: <PrivateRoute route={<SearchResults />} />
    },
-   {
+    {
     path: "show/:id",
     element: <PrivateRoute route={<Series />} />
-   },
-   {
+    },
+    {
      path: "episode/:id",
      element: <PrivateRoute route={<Episode/>} />
-   }
+    },
+     {
+         path: "profile/:username",
+         element: <PrivateRoute route={<Profile/>} />
+     },
+     {
+         path: "settings/",
+         element: <PrivateRoute route={<Settings/>} />
+     }
 
 ]);
 

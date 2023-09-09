@@ -11,6 +11,7 @@ psycopg2 = "*"
 python-dotenv = "*"
 djangorestframework-simplejwt = "*"
 requests = "*"
+npm = "*"
 
 [dev-packages]
 
