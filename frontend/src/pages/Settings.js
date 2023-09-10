@@ -33,7 +33,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Alert from '@mui/material/Alert';
 
 function Settings() {
-    const { user, authContext, authTokens } = useContext(AuthContext);
+    const { user, authContext, authTokens, update, logout } = useContext(AuthContext);
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [isPasswordChangeDialogOpen, setPasswordChangeDialogOpen] = useState(false)
     const [isSuccessfulOpen, setSuccessfulOpen] = useState(false)
@@ -50,6 +50,9 @@ function Settings() {
     const [country, setCountry] = useState(null)
     const [birthDate, setBirthDate] = useState(null)
     const [originalInfos, setOriginalInfos] = useState({})
+    const [passwordConfirmation, setPasswordConfirmation] = useState("")
+    const [newPassword, setNewPassword] = useState("")
+    const [newPassword2, setNewPassword2] = useState("")
 
     useEffect(() => {
         getUserInfos(user?.profileId)
@@ -88,31 +91,45 @@ function Settings() {
     }
 
     async function makeAccountDeleteRequest() {
-
+        try {
+            const requestOptions = {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                }
+            }
+            let response = await fetch(`/accounts/api/user/account/delete/`, requestOptions)
+            if (response.ok) {
+                logout()
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async function makeAccountChangeRequest(profileId) {
         try {
             if (checkForChanges()) {
-              const requestOptions = {
-                  method: "PUT",
-                  headers: {
-                      "Content-Type": "application/json",
-                      "Authorization": 'Bearer ' + String(authTokens?.access)
-                  },
-                  body: JSON.stringify({
-                      "username": userName,
-                      "first_name": firstName,
-                      "last_name": lastName,
-                      "email": email,
-                      "gender": gender,
-                      "country": country,
-                      "birth_date": birthDate
-                  })
-              }
-              let response = await fetch(`/accounts/api/user/info/own/change/${profileId}/`, requestOptions)
+                const requestOptions = {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": 'Bearer ' + String(authTokens?.access)
+                    },
+                    body: JSON.stringify({
+                        "username": userName,
+                        "first_name": firstName,
+                        "last_name": lastName,
+                        "email": email,
+                        "gender": gender,
+                        "country": country,
+                        "birth_date": birthDate
+                    })
+                }
+                let response = await fetch(`/accounts/api/user/info/own/change/${profileId}/`, requestOptions)
                 if (response.ok) {
-                    setSuccessMessage("Successfully updated your profile infos!")
+                    setSuccessMessage("Successfully updated your profile infos! We're logging you out...")
                     setSuccessfulOpen(true)
                     let { username, first_name, last_name, email, gender, country, birth_date} = await response.json()
                     setUserName(username)
@@ -122,6 +139,10 @@ function Settings() {
                     setGender(gender)
                     setCountry(country)
                     setBirthDate(birth_date)
+                    let timeout = setInterval(() => {
+                        logout()
+                    }, 5000);
+                    () => clearTimeout(timeout)
                 } else {
                     if (response.status === 400) {
                         let errorMsg = createErrorMessage(await response.json())
@@ -136,6 +157,53 @@ function Settings() {
             } else {
                 setWarningMessage("No changes were made. Could not update your profile infos!")
                 setWarningOpen(true)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function makePasswordChangeRequest() {
+        try {
+            const requestOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + String(authTokens?.access)
+                },
+                body: JSON.stringify({
+                    "current_password": passwordConfirmation,
+                    "password": newPassword,
+                    "password2": newPassword2
+                })
+            }
+            let response = await fetch("/accounts/api/user/password/change/", requestOptions)
+            if (response.ok) {
+                setSuccessMessage("Successfully changed your password!")
+                setSuccessfulOpen(true)
+                setPasswordChangeDialogOpen(false)
+                resetPasswordValues()
+            } else {
+                if (response.status === 401) {
+                    setWarningMessage("The password you entered is incorrect!")
+                    setWarningOpen(true)
+                    setPasswordChangeDialogOpen(false)
+                    resetPasswordValues()
+                } else if (response.status === 400) {
+                    let data = await response.json()
+                    console.log(data)
+                    let errorMsg = createErrorMessage(data)
+                    setErrorMessage(errorMsg)
+                    setErrorOpen(true)
+                    setPasswordChangeDialogOpen(false)
+                    resetPasswordValues()
+                }
+                else {
+                    setErrorMessage("Failed to change your password. Please Try Again!")
+                    setErrorOpen(true)
+                    setPasswordChangeDialogOpen(false)
+                    resetPasswordValues()
+                }
             }
         } catch (error) {
             console.log(error)
@@ -171,6 +239,12 @@ function Settings() {
         }
 
         return `${fieldName}: ${data[key]}`
+    }
+
+    function resetPasswordValues() {
+        setPasswordConfirmation("")
+        setNewPassword("")
+        setNewPassword2("")
     }
 
     const successAlert =
@@ -295,7 +369,7 @@ function Settings() {
                                     size="large"
                                     variant="contained"
                                     endIcon={<LockResetIcon/>}
-                                    onClick={() => setErrorOpen(true)}
+                                    onClick={() => setPasswordChangeDialogOpen(true)}
                                 >
                                     Change Password
                                 </Button>
@@ -338,6 +412,59 @@ function Settings() {
                                             size={"large"}
                                     >
                                         Yes
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+                            <Dialog
+                                open={isPasswordChangeDialogOpen}
+                                onClose={() => (setPasswordChangeDialogOpen(false))}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description"
+                            >
+                                <DialogTitle id="alert-dialog-title-password">
+                                    {"Change or Reset your password"}
+                                </DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText id="alert-dialog-description">
+                                        Enter your current password and create a new one.
+                                        Forgot your password? Click here to reset it.
+                                    </DialogContentText>
+                                </DialogContent>
+                                <Stack direction={"column"} spacing={2} sx={{p: 2}}>
+                                <TextField
+                                    label={"Current Password"}
+                                    type={"password"}
+                                    value={passwordConfirmation}
+                                    onChange={(event) => setPasswordConfirmation(event.target.value)}
+                                />
+                                <TextField
+                                    label={"New Password Again"}
+                                    type={"password"}
+                                    value={newPassword}
+                                    onChange={(event) => setNewPassword(event.target.value)}
+                                />
+                                <TextField
+                                    label={"New Password Again"}
+                                    type={"password"}
+                                    value={newPassword2}
+                                    onChange={(event) => setNewPassword2(event.target.value)}
+                                />
+                                </Stack>
+                                <DialogActions>
+                                    <Button onClick={() => setPasswordChangeDialogOpen(false)}
+                                            autoFocus
+                                            variant={"outlined"}
+                                            size={"large"}
+                                            color={"primary"}
+                                    >
+                                        Back
+                                    </Button>
+                                    <Button onClick={() => makePasswordChangeRequest()}
+                                            color={"error"}
+                                            variant={"contained"}
+                                            size={"large"}
+                                    >
+                                        Change Password
                                     </Button>
                                 </DialogActions>
                             </Dialog>

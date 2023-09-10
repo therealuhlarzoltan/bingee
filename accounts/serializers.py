@@ -41,7 +41,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         email_qs = CustomUser.objects.filter(email=data.get("email"))
         if email_qs.exists():
             raise serializers.ValidationError({"email":"A user with this email address already exists"})
-        return data
+        return super().validate(data)
         
 
     def save(self):
@@ -93,6 +93,9 @@ class UserInfoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"gender":"Gender must be a valid choice"})
         email_qs = CustomUser.objects.filter(email=attrs.get("email"))
         if email_qs.exists():
-            raise serializers.ValidationError({"email": "A user with this email address already exists"})
+            account = email_qs.first()
+            if (account.profile.id != self.instance.profile.id):
+                raise serializers.ValidationError({"email": "A user with this email address already exists"})
+
         return  super().validate(attrs)
 

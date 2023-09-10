@@ -25,8 +25,8 @@ function Landing() {
         <Grid container justifyContent="center" alignItems="center" sx={{ height: "80%" }}>
             <Grid item xs={6}>
                 <Paper elevation={3}>
-                    <Grid container display={"flex"} justifyContent="center" alignItems="center">
-                        <Typography textAlign={"center"} variant="h2" sx={{my: "36px"}}>Welcome to Bingee</Typography>
+                    <Grid container display={"flex"} justifyContent="center" alignItems="center" flexDirection={"column"}>
+                        <Typography textAlign={"center"} variant="h2" sx={{my: "18px"}}>Welcome to Bingee</Typography>
                         <Stack spacing={2} direction="row" sx={{my: "10px"}}>
                             {buttons}
                         </Stack>

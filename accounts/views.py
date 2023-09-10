@@ -1,7 +1,10 @@
 from django.shortcuts import render
+from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound
@@ -75,6 +78,50 @@ class UpdateUserInfoView(UpdateAPIView):
         profile = Profile.objects.get(id=self.kwargs[self.lookup_url_kwarg])
         profile.username = serializer.data.get("username")
         profile.save()
+
+
+class DeleteAccountView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, DoesProfileMatch]
+    http_method_names = ["delete"]
+    queryset = User.objects.all()
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        profile_id = self.request.user.profile.id
+        queryset = queryset.filter(profile__id=profile_id)
+        if not queryset.exists():
+            raise NotFound({"message":"Object with id not found"}, code=400)
+        obj = queryset.first()
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["post"]
+
+    def post(self, request):
+        password_confirmation = request.data.get("current_password")
+        new_password = request.data.get("password")
+        new_password2 = request.data.get("password2")
+        username = request.user.username
+        user = authenticate(username=username, password=password_confirmation)
+        if user is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            if new_password != new_password2:
+                return Response({"password_confirmation": "passwords must match."}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                validate_password(new_password, user)
+            except ValidationError as error:
+                error_dict = {
+                    "new_password": error.messages[0]
+                }
+                return Response(data=error_dict, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 
