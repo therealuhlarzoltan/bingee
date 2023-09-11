@@ -11,7 +11,7 @@ from rest_framework.exceptions import NotFound
 
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import CustomTokenObtainPairSerializer, UserInfoSerializer
+from .serializers import CustomTokenObtainPairSerializer, UserInfoSerializer, ProfileInfoSerializer
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -132,7 +132,7 @@ class GetProfile(RetrieveAPIView):
     queryset = Profile.objects.all()
     lookup_url_kwarg = "username"
     lookup_field = "username"
-    serializer_class = UserInfoSerializer
+    serializer_class = ProfileInfoSerializer
 
 
 class GetProfileSeries(ListAPIView):

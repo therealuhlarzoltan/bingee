@@ -75,7 +75,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
-    id = serializers.UUIDField(required=False)
     country = serializers.CharField(required=True)
     gender = serializers.CharField(required=True)
     birth_date = serializers.DateField(required=True)
@@ -117,3 +116,12 @@ class RecentlyWatchedShowsSerializer(SeriesSerializer):
             result = 0
 
         return round(result, 2)
+
+
+class ProfileInfoSerializer(UserInfoSerializer):
+    id = serializers.UUIDField(read_only=True)
+    number_of_episodes = serializers.IntegerField(read_only=True)
+    number_of_shows = serializers.IntegerField(read_only=True)
+
+
+
