@@ -191,7 +191,6 @@ function Settings() {
                     resetPasswordValues()
                 } else if (response.status === 400) {
                     let data = await response.json()
-                    console.log(data)
                     let errorMsg = createErrorMessage(data)
                     setErrorMessage(errorMsg)
                     setErrorOpen(true)

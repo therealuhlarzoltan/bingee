@@ -12,6 +12,7 @@ urlpatterns = [
     path("api/user/info/own/get/<uuid:id>/", GetUserInfoView.as_view(), name="get_own_user_info"),
     path("api/user/info/own/change/<uuid:id>/", UpdateUserInfoView.as_view(), name="update_own_user_info"),
     path("api/user/account/delete/", DeleteAccountView.as_view(), name="delete_account"),
-    path("api/user/password/change/", ChangePasswordView.as_view(), name="password_change")
+    path("api/user/password/change/", ChangePasswordView.as_view(), name="password_change"),
+    path("api/user/profile/<str:username>/", )
 
 ]

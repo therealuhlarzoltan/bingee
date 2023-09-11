@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView, DestroyAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound
@@ -18,8 +18,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.contrib.auth import get_user_model
 
-from .serializers import UserCreateSerializer
+from shows.serializers import EpisodeSerializer, SeriesSerializer
+
+from .serializers import UserCreateSerializer, RecentlyWatchedShowsSerializer
 from .models import Profile
+from shows.models import Series, Episode, WatchedEpisode
 
 from feedback.permissions import DoesProfileMatch
 
@@ -121,6 +124,49 @@ class ChangePasswordView(APIView):
 
         user.set_password(new_password)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class GetProfile(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get"]
+    queryset = Profile.objects.all()
+    lookup_url_kwarg = "username"
+    lookup_field = "username"
+    serializer_class = UserInfoSerializer
+
+
+class GetProfileSeries(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get"]
+    serializer_class = RecentlyWatchedShowsSerializer
+    queryset = Series.objects.all()
+    lookup_url_kwarg = "id"
+
+    def get_queryset(self):
+        profile = Profile.objects.filter(id=self.kwargs[self.lookup_url_kwarg])
+        if not profile.exists():
+            raise NotFound("Object not found", code=404)
+        profile = profile.first()
+        shows = profile.shows_added.all()
+        return shows
+
+
+
+
+class GetProfileEpisodes(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get"]
+    serializer_class = EpisodeSerializer
+    queryset = Episode.objects.all()
+    lookup_url_kwarg = "id"
+
+    def get_queryset(self):
+        profile = Profile.objects.filter(id=self.kwargs[self.lookup_url_kwarg])
+        if not profile.exists():
+            raise NotFound("Object not found", code=404)
+        profile = profile.first()
+        watched_episodes = WatchedEpisode.objects.filter(profile=profile).order_by("-timestamp")[0:3].get()
+        return watched_episodes
 
 
 

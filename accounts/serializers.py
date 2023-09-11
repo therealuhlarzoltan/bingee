@@ -13,6 +13,9 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from shows.serializers import SeriesSerializer
+from shows.models import Episode, Series, WatchedEpisode
+
 
 class UserCreateSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
@@ -72,6 +75,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(required=False)
     country = serializers.CharField(required=True)
     gender = serializers.CharField(required=True)
     birth_date = serializers.DateField(required=True)
@@ -80,7 +84,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(required=True)
     class Meta:
         model = CustomUser
-        fields = ["username", "first_name", "last_name", "email", "gender", "country", "birth_date"]
+        fields = ["id", "username", "first_name", "last_name", "email", "gender", "country", "birth_date"]
 
     def validate(self, attrs):
         if (len(attrs.get("last_name")) > 16):
@@ -99,3 +103,17 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
         return  super().validate(attrs)
 
+
+class RecentlyWatchedShowsSerializer(SeriesSerializer):
+    percentage_complete = serializers.SerializerMethodField
+
+    def get_percentage_complete(self, obj):
+        total_episodes = Episode.objects.filter(series=obj).count()
+        watched = WatchedEpisode.objects.filter(series=obj).count()
+
+        try:
+            result = float(watched) / float(total_episodes)
+        except ZeroDivisionError:
+            result = 0
+
+        return round(result, 2)
