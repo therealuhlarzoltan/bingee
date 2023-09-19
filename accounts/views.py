@@ -165,12 +165,9 @@ class GetProfileEpisodes(ListAPIView):
         if not profile.exists():
             raise NotFound("Object not found", code=404)
         profile = profile.first()
-        watched_episodes = WatchedEpisode.objects.filter(profile=profile).order_by("-timestamp")
-        episodes = []
-        for watched_episode in watched_episodes:
-            episodes.append(watched_episode.episode)
-        if len(episodes) >= 3:
-            episodes = episodes[:2]
+        episodes = Series.objects.find_recently_watched_episodes_by_series(profile)
+        pks = [item.pk for item in episodes]
+        episodes_qs = Episode.objects.filter(pk__in=pks)
         return episodes
 
 

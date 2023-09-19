@@ -10,10 +10,10 @@ import Stack from "@mui/material/Stack";
 import CircularProgress from "@mui/material/CircularProgress";
 import AddedSeries from "../components/AddedSeries";
 import NewSeries from "../components/NewSeries";
-import EpisodeCard from "../components/EpisodeCard";
+import EpisodeCardWithoutControls from "../components/EpisodeCardWithoutControls";
 import SeriesCard from "../components/SeriesCard"
-import Divider from "@mui/material/Divider";
 import SeriesProgressCard from "../components/SeriesProgressCard";
+import Divider from "@mui/material/Divider";
 import ListItem from "@mui/joy/ListItem";
 import List from "@mui/joy/List";
 
@@ -108,7 +108,9 @@ function Profile() {
             </Grid>
             <Grid item xs={9} flexDirection="column">
                 <Grid item xs={9} flexDirection="row" style={{ "max-width": "100%" }}>
-                    <Typography variant="h3" sx={{mb: 2, mx: 2}}>Currently Watching</Typography>
+                    <Typography variant="h3" sx={{mb: 2, mx: 2}}>
+                        Watched Series
+                    </Typography>
                     <Stack spacing={4} direction="row" flexWrap={"wrap"} sx={{paddingLeft: 2}}>
                         {series.map((series) => {
                             return (
@@ -116,6 +118,20 @@ function Profile() {
                     );
                 })}
                     </Stack>
+                    <Divider sx={{borderTopWidth: "5px", borderRadius: "5px", my: 3}} />
+                </Grid>
+                <Grid item xs={9} flexDirection="row" style={{ "max-width": "100%" }}>
+                    <Typography variant="h3" sx={{mb: 2, mx: 2}}>
+                        Recently Watched Episodes
+                    </Typography>
+                    <Stack spacing={4} direction="row" flexWrap={"wrap"} sx={{paddingLeft: 2}}>
+                        {episodes.map((epiosde) => {
+                            return (
+                                <EpisodeCardWithoutControls episode={epiosde}/>
+                            );
+                        })}
+                    </Stack>
+                    <Divider sx={{borderTopWidth: "5px", borderRadius: "5px", my: 3}} />
                 </Grid>
             </Grid>
         </Grid>

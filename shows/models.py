@@ -40,6 +40,19 @@ class SeriesManager(models.Manager):
         else:
             return series.seasons.first().episodes.first()
 
+    def find_recently_watched_episodes_by_series(self, profile):
+        watched = WatchedEpisode.objects.filter(profile=profile).order_by("-timestamp")
+        episodes = []
+        series = []
+        for i in range(0, watched.count()):
+            if watched[i].series not in series:
+                series.append(watched[i].series)
+                episodes.append(watched[i].episode)
+                if len(episodes) >= 4:
+                    break
+
+        return episodes
+
 class Series(models.Model):
     title = models.CharField(max_length=128, default="")
     title_id = models.CharField(max_length=64, unique=True, default="")
