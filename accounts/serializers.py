@@ -104,24 +104,43 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
 
 class RecentlyWatchedShowsSerializer(SeriesSerializer):
-    percentage_complete = serializers.SerializerMethodField
+    percentage_complete = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Series
+        fields = SeriesSerializer.Meta.fields + ["percentage_complete"]
 
     def get_percentage_complete(self, obj):
         total_episodes = Episode.objects.filter(series=obj).count()
         watched = WatchedEpisode.objects.filter(series=obj).count()
 
         try:
-            result = float(watched) / float(total_episodes)
+            result = (float(watched) / float(total_episodes)) * 100
         except ZeroDivisionError:
             result = 0
 
         return round(result, 2)
 
 
-class ProfileInfoSerializer(UserInfoSerializer):
-    id = serializers.UUIDField(read_only=True)
-    number_of_episodes = serializers.IntegerField(read_only=True)
-    number_of_shows = serializers.IntegerField(read_only=True)
+class ProfileSerializerUserSerializer(serializers.ModelSerializer):
+        first_name = serializers.CharField(read_only=True)
+        last_name = serializers.CharField(read_only=True)
+        country = serializers.CharField(read_only=True)
+        gender = serializers.CharField(read_only=True)
+        birth_date = serializers.CharField(read_only=True)
+
+        class Meta:
+            model = CustomUser
+            fields = ["first_name", "last_name", "country", "gender", "birth_date"]
+
+
+class ProfileInfoSerializer(serializers.ModelSerializer):
+
+    user = ProfileSerializerUserSerializer(read_only=True)
+
+    class Meta:
+        model = Profile
+        fields=["id", "number_of_episodes", "number_of_shows", "username", "user"]
 
 
 
