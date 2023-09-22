@@ -39,6 +39,7 @@ import { useNavigate } from "react-router-dom";
 function SideDrawer(props) {
 
   const navigate = useNavigate();
+  let { firstName, lastName, username } = props;
 
   function handleSearchFormSubmitted() {
     if (searchValue != "") {
@@ -110,7 +111,7 @@ function SideDrawer(props) {
               </ListItemButton>
             </ListItem>
             <ListItem key={"Watchlist"} disablePadding>
-              <ListItemButton>
+              <ListItemButton onClick={() => navigate("/")}>
                 <ListItemIcon>
                     <PlaylistAddCheckIcon />
                 </ListItemIcon>
@@ -126,7 +127,7 @@ function SideDrawer(props) {
               </ListItemButton>
             </ListItem>
             <ListItem key={"Profile"} disablePadding>
-              <ListItemButton>
+              <ListItemButton onClick={() => navigate(`/profile/${username}/`)}>
                 <ListItemIcon>
                     <AccountCircleIcon />
                 </ListItemIcon>
@@ -138,10 +139,10 @@ function SideDrawer(props) {
         </List>
         
         <Divider />
-        <Typography variant="subtitle2" sx={{ mt: 2, ml: 2 }}>{props?.firstName?.toUpperCase()} {props?.lastName?.toUpperCase()}</Typography>
+        <Typography variant="subtitle2" sx={{ mt: 2, ml: 2 }}>{firstName?.toUpperCase()} {lastName?.toUpperCase()}</Typography>
         <List>
             <ListItem key={"Settings"} disablePadding>
-              <ListItemButton>
+              <ListItemButton onClick={() => navigate("/settings/")}>
                 <ListItemIcon>
                 <SettingsIcon />
                 </ListItemIcon>

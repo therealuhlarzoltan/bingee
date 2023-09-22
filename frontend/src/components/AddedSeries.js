@@ -239,7 +239,7 @@ function AddedSeries(props) {
     return (
         <Grid container columnSpacing={0} rowSpacing={3}>
             <Grid item xs={3} flexDirection="column">
-                <SideDrawer firstName={user.firstName} lastName={user.lastName} />
+                <SideDrawer firstName={user.firstName} lastName={user.lastName} username={user.username} />
             </Grid>
             <Grid item xs={9} flexDirection="column">
                 <Grid item xs={9} flexDirection="row" sx={{height: "50%"}} style={{ "max-width": "100%" }}>

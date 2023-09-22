@@ -209,7 +209,7 @@ function CommentComponent(props) {
         <Paper elevation={3} sx={{width: "320px", m: 2, p: 2, textOverflow: "scroll", borderRadius: "4px"}}>
             <Box display={"flex"} flexDirection={"row"} alignItems={"center"} sx={{gap: "6px"}}>
                 <Avatar><i className="fa-regular fa-user fa-lg"/></Avatar>
-                <Link to={"/"} style={{"text-decoration": "none", "color":"black"}}><Typography variant="subtitle" sx={{fontWeight: "bold"}}>@{props?.profile.username}</Typography></Link>
+                <Link to={`/profile/${profile?.username}/`} style={{"text-decoration": "none", "color":"black"}}><Typography variant="subtitle" sx={{fontWeight: "bold"}}>@{profile?.username}</Typography></Link>
             </Box>
             { isEditing ? <>
                 <Box>

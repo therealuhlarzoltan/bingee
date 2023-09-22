@@ -20,7 +20,7 @@ function RatingComponent(props) {
         <Paper elevation={3} sx={{borderRadius: "4px", width: "320px", m : 2, p: 2}}>
             <Box display={"flex"} flexDirection={"row"} alignItems={"center"} sx={{gap: "6px", mb: 1}}>
                 <Avatar><i className="fa-regular fa-user fa-lg"/></Avatar>
-                <Link to={"/"} style={{"text-decoration": "none", "color":"black"}}><Typography variant="subtitle" sx={{fontWeight: "bold"}}>@{profile.username}</Typography></Link>
+                <Link to={`/profile/${profile.username}/`} style={{"text-decoration": "none", "color":"black"}}><Typography variant="subtitle" sx={{fontWeight: "bold"}}>@{profile.username}</Typography></Link>
             </Box>
             <Box>
                 <Rating name="read-only" value={rating} precision={0.5} readOnly />
