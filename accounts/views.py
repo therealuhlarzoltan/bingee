@@ -47,7 +47,6 @@ class RegisterView(APIView):
     permission_classes = []
     
     def post(self, request):
-        print("Incoming request: ", request.data)
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -123,6 +122,7 @@ class ChangePasswordView(APIView):
                 return Response(data=error_dict, status=status.HTTP_400_BAD_REQUEST)
 
         user.set_password(new_password)
+        user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

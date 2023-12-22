@@ -1,6 +1,4 @@
-import { render } from "react-dom";
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React, {useContext, useState} from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,22 +8,17 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import InputLabel from '@mui/material/InputLabel';
-import { Select } from "@mui/material";
-import { pink, blue } from '@mui/material/colors';
+import {Select} from "@mui/material";
+import {blue, pink} from '@mui/material/colors';
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
-import { useState } from "react";
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import { margin } from "@mui/system";
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
-import { Link } from "react-router-dom";
-import { useContext } from "react";
+import {Link, Navigate} from "react-router-dom";
 import AuthContext from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
-import Paper from "@mui/material/Paper";
+import DatePickerComponent from "../components/DatePickerComponent";
 
 
 function Register() {
@@ -66,7 +59,29 @@ function Register() {
         setGender(event.target.value);
     };
 
+    const [ birthDate, setBirthDate ] = useState(getTodaysDateString());
+
+
     const { user } = useContext(AuthContext);
+
+    function getTodaysDateString() {
+        let date = new Date();
+
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+
+        let dateString = `${month < 10 ? '0' : ''}${month}/${day < 10 ? '0' : ''}${day}/${year}`;
+
+        return dateString;
+    }
+
+    function convertDayObjectToString(date) {
+        let year = date.$y;
+        let month = date.$M + 1;
+        let day = date.$D;
+        return `${year}/${month}/${day}`
+    }
 
 
     function handleRegistrationResponse(response, status) {
@@ -126,6 +141,14 @@ function Register() {
 
 
     function handleRegisterButtonClicked() {
+        let localBirthDate
+        if (birthDate === getTodaysDateString()) {
+            const separated = birthDate.split("/")
+            localBirthDate = `${separated[2]}/${separated[0]}/${separated[1]}`
+
+        } else {
+            localBirthDate = birthDate
+        }
         const newUser = {
             username: username,
             email: email,
@@ -135,7 +158,7 @@ function Register() {
             last_name: lastName,
             gender: gender,
             country: country,
-            birth_date: "2003-04-18"
+            birth_date: localBirthDate.replaceAll("/", "-")
         };
 
         const requestOptions = {
@@ -277,6 +300,9 @@ function Register() {
                     <MenuItem value={"UK"}>United Kingdom</MenuItem>
                     </Select>
                 </FormControl>
+            </Grid>
+            <Grid item xs={12} align="center">
+               <DatePickerComponent value={birthDate} setValue={(value) => setBirthDate(convertDayObjectToString(value))} label={"Birthdate"}/>
             </Grid>
             <Grid item xs={12} align="center">
                 <Button

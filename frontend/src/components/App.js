@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider, } from "react-router-dom";
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import { AuthProvider } from "../context/AuthContext";
 
