@@ -26,40 +26,40 @@ function Logout() {
             setError(true);
         }
     }
-   
+
 
     return (
         <div>
-        <Grid Grid container rowSpacing={2} columnSpacing={4}>
+            <Grid Grid container rowSpacing={2} columnSpacing={4}>
                 <Grid item xs={12} id="alert-grid">
                     {error ? <Alert severity="error" sx={{ width: "36%", margin: "auto", mb: 2 }}
-                            action={
-                                <IconButton
-                                    aria-label="close"
-                                    color="inherit"
-                                    size="small"
-                                    onClick={() => {
-                                        setError(null);
-                                        setAlert(null);
-                                    }}
-                                >
-                                 <CloseIcon fontSize="inherit" />
-                             </IconButton>
-                            }
-                        > 
-                            {alert}
-                        </Alert> : null}
+                                    action={
+                                        <IconButton
+                                            aria-label="close"
+                                            color="inherit"
+                                            size="small"
+                                            onClick={() => {
+                                                setError(null);
+                                                setAlert(null);
+                                            }}
+                                        >
+                                            <CloseIcon fontSize="inherit" />
+                                        </IconButton>
+                                    }
+                    >
+                        {alert}
+                    </Alert> : null}
                 </Grid>
-        </Grid>
-        <h1>Logout</h1>
-        <Button sx={{"marginTop": "10px"}}
+            </Grid>
+            <h1>Logout</h1>
+            <Button sx={{"marginTop": "10px"}}
                     color="error"
                     size="large"
                     variant="contained"
                     onClick={handleLogoutButtonClicked}
-                >
+            >
                 Logout
-            </Button> 
+            </Button>
         </div>
     );
 }

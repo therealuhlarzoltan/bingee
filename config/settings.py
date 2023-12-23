@@ -14,7 +14,8 @@ import os
 
 from dotenv import load_dotenv
 load_dotenv()
-
+from django.db import connections
+from django.db.utils import OperationalError
 from datetime import timedelta
 
 from pathlib import Path
@@ -99,12 +100,18 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('DATABASE_NAME'), 
+        'NAME': os.getenv('DATABASE_NAME'),
         'USER': os.getenv('DATABASE_USER'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'), 
+        'HOST': os.getenv('DATABASE_HOST'),
         'PORT': os.getenv('DATABASE_PORT'),
+    },
+    'fallback': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'if': 'not DATABASE_NAME',
     }
+
 }
 
 

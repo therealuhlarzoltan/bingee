@@ -27,13 +27,10 @@ function Landing() {
                 <Paper elevation={3}>
                     <Grid container display={"flex"} justifyContent="center" alignItems="center" flexDirection={"column"}>
                         <Typography textAlign={"center"} variant="h2" sx={{my: "18px"}}>Welcome to Bingee</Typography>
-                        <Stack spacing={2} direction="row" sx={{my: "10px"}}>
+                        <Stack spacing={2} direction="row" sx={{my: "40px"}}>
                             {buttons}
                         </Stack>
                     </Grid>
-                    <Stack spacing={2} direction="row" sx={{my: "10px"}} justifyContent="center">
-                        <Typography variant="subtitle2" sx={{my: "40px"}}>Forgot your password? Click here to reset it!</Typography>
-                    </Stack>
                 </Paper>
             </Grid>
       </Grid>

@@ -94,36 +94,12 @@ function SideDrawer(props) {
                 />
               </Paper>
           </ListItem>
-            <ListItem key={"Calendar"} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                    <CalendarMonthIcon />
-                </ListItemIcon>
-                <ListItemText primary={"Calendar"} />
-              </ListItemButton>
-          </ListItem>
-          <ListItem key={"Upcoming"} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                    <ScheduleIcon />
-                </ListItemIcon>
-                <ListItemText primary={"Upcoming"} />
-              </ListItemButton>
-            </ListItem>
             <ListItem key={"Watchlist"} disablePadding>
               <ListItemButton onClick={() => navigate("/")}>
                 <ListItemIcon>
                     <PlaylistAddCheckIcon />
                 </ListItemIcon>
                 <ListItemText primary={"Watchlist"} />
-              </ListItemButton>
-            </ListItem>
-            <ListItem key={"Explore"} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                    <ExploreIcon />
-                </ListItemIcon>
-                <ListItemText primary={"Explore"} />
               </ListItemButton>
             </ListItem>
             <ListItem key={"Profile"} disablePadding>
@@ -158,7 +134,6 @@ function SideDrawer(props) {
                 </ListItemIcon>
                 <ListItemText primary={"Logout"} />
               </ListItemButton>
-              
             </ListItem>
             </Link>
         </List>

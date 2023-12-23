@@ -168,7 +168,7 @@ class GetProfileEpisodes(ListAPIView):
         episodes = Series.objects.find_recently_watched_episodes_by_series(profile)
         pks = [item.pk for item in episodes]
         episodes_qs = Episode.objects.filter(pk__in=pks)
-        return episodes
+        return episodes_qs
 
 
 
